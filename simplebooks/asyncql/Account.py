@@ -85,7 +85,6 @@ class Account(AsyncSqlModel):
         if self.type in (
             AccountType.ASSET, AccountType.DEBIT_BALANCE,
             AccountType.CONTRA_LIABILITY, AccountType.CONTRA_EQUITY,
-            AccountType.NOSTRO_ASSET
         ):
             return totals[EntryType.DEBIT] - totals[EntryType.CREDIT] + totals['subaccounts']
 
