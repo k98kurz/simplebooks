@@ -24,10 +24,16 @@ class Currency(AsyncSqlModel):
         base = self.base or 10
         return Decimal(amount) / Decimal(base**self.decimals)
 
-    def get_units_and_change(self, amount: int) -> tuple[int, int]:
+    def get_units_and_change(self, amount: int) -> tuple[int,]:
         """Get the full units and subunits."""
+        def get_subunits(amount, base, decimals):
+            units_and_change = divmod(amount, base ** decimals)
+            if decimals > 1:
+                units_and_change = (units_and_change[0], *get_subunits(units_and_change[1], base, decimals-1))
+            return units_and_change
         base = self.base or 10
-        return divmod(amount, base ** self.decimals)
+        decimals = self.decimals
+        return get_subunits(amount, base, decimals)
 
     def format(self, amount: int, *, decimals: int = None,
                use_prefix: bool = True, use_postfix: bool = False,
