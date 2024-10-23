@@ -4,7 +4,7 @@ SimpleBooks is a simple accounting library that uses sqlite3 to persist data for
 identities, ledgers, accounts, transactions, and entries. Included are tools for
 accomplishing basic bookkeeping tasks. The basic accounting formula is this:
 `Assets = Liabilities + Equity`. Assets are debit-balance; liabilities and
-equity are credit-balance. Every transaction must have entries that have not net
+equity are credit-balance. Every transaction must have entries that have no net
 difference between the amount of credits and the amount of debits.
 
 This is a simplification of [bookchain](https://pypi.org/project/bookchain): all
