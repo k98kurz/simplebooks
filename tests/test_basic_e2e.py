@@ -1,10 +1,9 @@
-from context import models
+from context import models, simplebooks
 from genericpath import isfile
 from os import getcwd
 from sqlite3 import OperationalError
 from time import time
 import os
-import sqloquent.tools
 import unittest
 
 
@@ -23,7 +22,6 @@ class TestBasicE2E(unittest.TestCase):
         models.Entry.connection_info = DB_FILEPATH
         models.Transaction.connection_info = DB_FILEPATH
         models.Vendor.connection_info = DB_FILEPATH
-        sqloquent.DeletedModel.connection_info = DB_FILEPATH
         super().setUpClass()
 
     def setUp(self):
@@ -40,18 +38,8 @@ class TestBasicE2E(unittest.TestCase):
         super().tearDown()
 
     def automigrate(self):
-        sqloquent.tools.publish_migrations(MIGRATIONS_PATH)
-        tomigrate = [
-            models.Identity, models.Currency, models.Ledger,
-            models.Account, models.Entry, models.Transaction,
-            models.Customer, models.Vendor,
-        ]
-        for model in tomigrate:
-            name = model.__name__
-            m = sqloquent.tools.make_migration_from_model(model, name)
-            with open(f'{MIGRATIONS_PATH}/create_{name}.py', 'w') as f:
-                f.write(m)
-        sqloquent.tools.automigrate(MIGRATIONS_PATH, DB_FILEPATH)
+        simplebooks.publish_migrations(MIGRATIONS_PATH)
+        simplebooks.automigrate(MIGRATIONS_PATH, DB_FILEPATH)
 
     def test_e2e(self):
         with self.assertRaises(OperationalError):

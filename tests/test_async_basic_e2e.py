@@ -1,10 +1,9 @@
 from asyncio import run
-from context import asyncql
+from context import asyncql, simplebooks
 from genericpath import isfile
 from sqlite3 import OperationalError
 from time import time
 import os
-import sqloquent.tools
 import unittest
 
 
@@ -39,18 +38,8 @@ class TestAsyncBasicE2E(unittest.TestCase):
         super().tearDown()
 
     def automigrate(self):
-        sqloquent.tools.publish_migrations(MIGRATIONS_PATH)
-        tomigrate = [
-            asyncql.Identity, asyncql.Currency, asyncql.Ledger,
-            asyncql.Account, asyncql.Entry, asyncql.Transaction,
-            asyncql.Customer, asyncql.Vendor,
-        ]
-        for model in tomigrate:
-            name = model.__name__
-            m = sqloquent.tools.make_migration_from_model(model, name)
-            with open(f'{MIGRATIONS_PATH}/create_{name}.py', 'w') as f:
-                f.write(m)
-        sqloquent.tools.automigrate(MIGRATIONS_PATH, DB_FILEPATH)
+        simplebooks.publish_migrations(MIGRATIONS_PATH)
+        simplebooks.automigrate(MIGRATIONS_PATH, DB_FILEPATH)
 
     def test_e2e(self):
         with self.assertRaises(OperationalError):
