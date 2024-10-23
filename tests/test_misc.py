@@ -58,7 +58,7 @@ class TestMisc(unittest.TestCase):
             'prefix_symbol': '$',
             'fx_symbol': 'USD',
             'base': 100,
-            'decimals': 1,
+            'unit_divisions': 1,
         })
 
         assert currency.format(123) == '$1.23', currency.format(123)
@@ -69,7 +69,7 @@ class TestMisc(unittest.TestCase):
             'prefix_symbol': 'Ħ',
             'fx_symbol': 'MMH',
             'base': 60,
-            'decimals': 2,
+            'unit_divisions': 2,
         })
 
         assert currency.format(int(60*60*1.23)) == 'Ħ1.23', currency.format(int(60*60*1.23))
@@ -81,7 +81,7 @@ class TestMisc(unittest.TestCase):
             'prefix_symbol': '$',
             'fx_symbol': 'USD',
             'base': 100,
-            'decimals': 1,
+            'unit_divisions': 1,
         })
 
         assert currency.format(123) == '$1.23', currency.format(123)
@@ -92,7 +92,7 @@ class TestMisc(unittest.TestCase):
             'prefix_symbol': 'Ħ',
             'fx_symbol': 'MMH',
             'base': 60,
-            'decimals': 2,
+            'unit_divisions': 2,
         })
 
         assert currency.format(int(60*60*1.23)) == 'Ħ1.23', currency.format(int(60*60*1.23))
