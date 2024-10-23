@@ -7,7 +7,6 @@ from .Ledger import Ledger
 from .Transaction import Transaction
 from .Vendor import Vendor
 from sqloquent.asyncql import (
-    AsyncDeletedModel, AsyncAttachment,
     async_contains, async_within, async_has_many, async_belongs_to,
 )
 
@@ -16,8 +15,6 @@ Identity.ledgers = async_has_many(Identity, Ledger, 'identity_id')
 Ledger.owner = async_belongs_to(Ledger, Identity, 'identity_id')
 
 Ledger.currency = async_belongs_to(Ledger, Currency, 'currency_id')
-
-
 
 Ledger.accounts = async_has_many(Ledger, Account, 'ledger_id')
 Account.ledger = async_belongs_to(Account, Ledger, 'ledger_id')
@@ -47,8 +44,6 @@ def set_connection_info(db_file_path: str):
     Ledger.connection_info = db_file_path
     Transaction.connection_info = db_file_path
     Vendor.connection_info = db_file_path
-    AsyncDeletedModel.connection_info = db_file_path
-    AsyncAttachment.connection_info = db_file_path
 
 
 # no longer needed

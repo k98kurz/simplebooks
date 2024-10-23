@@ -10,7 +10,6 @@ from .models import (
     Transaction,
     Vendor,
 )
-from sqloquent import DeletedModel, Attachment
 import sqloquent.tools
 
 def set_connection_info(db_file_path: str):
@@ -25,8 +24,6 @@ def set_connection_info(db_file_path: str):
     Ledger.connection_info = db_file_path
     Transaction.connection_info = db_file_path
     Vendor.connection_info = db_file_path
-    DeletedModel.connection_info = db_file_path
-    Attachment.connection_info = db_file_path
 
 def publish_migrations(migration_folder_path: str):
     """Writes migration files for the models."""
@@ -40,8 +37,6 @@ def publish_migrations(migration_folder_path: str):
         Ledger,
         Transaction,
         Vendor,
-        DeletedModel,
-        Attachment,
     ]
     for model in models:
         name = model.__name__
