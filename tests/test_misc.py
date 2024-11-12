@@ -62,7 +62,7 @@ class TestMisc(unittest.TestCase):
         })
 
         assert currency.format(123) == '$1.23', currency.format(123)
-        assert currency.get_units_and_change(123) == (1, 23), currency.get_units_and_change(123)
+        assert currency.get_units(123) == (1, 23), currency.get_units(123)
 
         currency = models.Currency({
             'name': 'Mean Minute/Hour',
@@ -72,8 +72,10 @@ class TestMisc(unittest.TestCase):
             'unit_divisions': 2,
         })
 
-        assert currency.format(int(60*60*1.23)) == 'Ħ1.23', currency.format(int(60*60*1.23))
-        assert currency.get_units_and_change(60*60*2 + 123) == (2, 2, 3)
+        assert currency.format(60*60*1.23) == 'Ħ1.23', currency.format(60*60*1.23)
+        assert currency.get_units((60**2)*2 + (60**1)*2 + (60**0)*3) == (2, 2, 3)
+        assert currency.format(60*60 + 45, decimal_places=2) == 'Ħ1.01', \
+            currency.format(60*60 + 45, decimal_places=2)
 
     def test_asyncql_currency(self):
         currency = asyncql.Currency({
@@ -85,7 +87,7 @@ class TestMisc(unittest.TestCase):
         })
 
         assert currency.format(123) == '$1.23', currency.format(123)
-        assert currency.get_units_and_change(123) == (1, 23), currency.get_units_and_change(123)
+        assert currency.get_units(123) == (1, 23), currency.get_units(123)
 
         currency = asyncql.Currency({
             'name': 'Mean Minute/Hour',
@@ -95,8 +97,10 @@ class TestMisc(unittest.TestCase):
             'unit_divisions': 2,
         })
 
-        assert currency.format(int(60*60*1.23)) == 'Ħ1.23', currency.format(int(60*60*1.23))
-        assert currency.get_units_and_change(60*60*2 + 123) == (2, 2, 3)
+        assert currency.format(60*60*1.23) == 'Ħ1.23', currency.format(60*60*1.23)
+        assert currency.get_units((60**2)*2 + (60**1)*2 + (60**0)*3) == (2, 2, 3)
+        assert currency.format(60*60 + 45, decimal_places=2) == 'Ħ1.01', \
+            currency.format(60*60 + 45, decimal_places=2)
 
     def test_publish_migrations(self):
         assert len(os.listdir(MIGRATIONS_PATH)) < 2, os.listdir(MIGRATIONS_PATH)

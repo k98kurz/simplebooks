@@ -53,8 +53,8 @@ class TestAsyncBasicE2E(unittest.TestCase):
             'name': 'US Dollar',
             'prefix_symbol': '$',
             'fx_symbol': 'USD',
-            'base': 10,
-            'unit_divisions': 2,
+            'base': 100,
+            'unit_divisions': 1,
         }))
         ledger: asyncql.Ledger = run(asyncql.Ledger.insert({
             'name': 'General Ledger',
