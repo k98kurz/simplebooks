@@ -119,7 +119,7 @@ If you experience a bug and do not use Discord, open an issue on Github.
 
 ## Tests
 
-There are a total of 6 tests (2 e2e tests and 4 unit tests for miscellaneous
+There are a total of 7 tests (2 e2e tests and 5 tests for miscellaneous
 tools/features). To run them, clone the repo, set up a virtual environment
 (e.g. `python -m venv venv && source venv/bin/activate`), install the
 dependencies with `pip install -r requirements.txt`, and then run the following:
