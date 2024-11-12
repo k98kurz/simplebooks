@@ -24,8 +24,13 @@ class Currency(AsyncSqlModel):
         base = self.base or 10
         return Decimal(amount) / Decimal(base**self.unit_divisions)
 
-    def get_units_and_change(self, amount: int) -> tuple[int,]:
-        """Get the full units and subunits."""
+    def get_units(self, amount: int) -> tuple[int,]:
+        """Get the full units and subunits. The number of subunit
+            figures will be equal to unit_divisions; e.g. if base=10
+            and unit_divisions=2, get_units(200) will return (2, 0, 0);
+            if base=60 and unit_divisions=2, get_units(200) will return
+            (0, 3, 20).
+        """
         def get_subunits(amount, base, unit_divisions):
             units_and_change = divmod(amount, base ** unit_divisions)
             if unit_divisions > 1:
@@ -35,21 +40,20 @@ class Currency(AsyncSqlModel):
         unit_divisions = self.unit_divisions
         return get_subunits(amount, base, unit_divisions)
 
-    def format(self, amount: int, *, unit_divisions: int = None,
+    def format(self, amount: int, *, decimal_places: int = 2,
                use_prefix: bool = True, use_postfix: bool = False,
                use_fx_symbol: bool = False) -> str:
-        """Format an amount using the correct number of unit_divisions."""
-        if not unit_divisions:
-            unit_divisions = self.unit_divisions
-
+        """Format an amount using the correct number of decimal_places."""
         amount: str = str(self.to_decimal(amount))
         if '.' not in amount:
             amount += '.'
-        digits = len(amount.split('.')[1])
+        digits = amount.split('.')[1]
 
-        while digits < unit_divisions:
-            amount += '0'
-            digits += 1
+        while len(digits) < decimal_places:
+            digits += '0'
+
+        digits = digits[:decimal_places]
+        amount = f"{amount.split('.')[0]}.{digits}"
 
         if self.postfix_symbol and use_postfix:
             return f"{amount}{self.postfix_symbol}"
