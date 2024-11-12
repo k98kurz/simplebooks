@@ -8,7 +8,7 @@ version = "0.1.0"
 authors = [
   { name="k98kurz", email="k98kurz@gmail.com" },
 ]
-description = "Simple double-entry accounting system using sqlite3 for data storage."
+description = "Simple double-entry accounting system using sqloquent for data storage."
 readme = "readme.md"
 license = { file = "license" }
 requires-python = ">=3.10"
@@ -21,7 +21,7 @@ classifiers = [
   "Topic :: Office/Business :: Financial :: Accounting",
 ]
 dependencies = [
-  "sqloquent >= 0.4.7",
+  "sqloquent >= 0.5.3",
 ]
 
 [project.urls]
@@ -30,7 +30,7 @@ dependencies = [
 
 [project.optional-dependencies]
 asyncql = [
-  "sqloquent[asyncql] >= 0.4.7",
+  "sqloquent[asyncql] >= 0.5.3",
 ]
 docs = [
   "autodox >= 0.1.16"
