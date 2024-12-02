@@ -8,13 +8,14 @@ from .models import (
     EntryType,
     Identity,
     Ledger,
+    LedgerType,
     Transaction,
     Vendor,
 )
 import sqloquent.tools
 
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 def set_connection_info(db_file_path: str):
     """Set the connection info for all models to use the specified

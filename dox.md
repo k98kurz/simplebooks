@@ -318,6 +318,11 @@ Ensure conditions are encoded before querying.
 Creates and returns a list of 3 unsaved Accounts covering the 3 basic
 categories: Asset, Liability, Equity.
 
+### `LedgerType(Enum)`
+
+Enum of valid ledger types: PRESENT and FUTURE for cash and accrual accounting,
+respectively.
+
 ### `Transaction(SqlModel)`
 
 #### Annotations
