@@ -18,6 +18,7 @@ class TestAsyncBasicE2E(unittest.TestCase):
         asyncql.Currency.connection_info = DB_FILEPATH
         asyncql.Ledger.connection_info = DB_FILEPATH
         asyncql.Account.connection_info = DB_FILEPATH
+        asyncql.AccountCategory.connection_info = DB_FILEPATH
         asyncql.Entry.connection_info = DB_FILEPATH
         asyncql.Transaction.connection_info = DB_FILEPATH
         asyncql.Vendor.connection_info = DB_FILEPATH
@@ -47,6 +48,25 @@ class TestAsyncBasicE2E(unittest.TestCase):
         self.automigrate()
         assert run(asyncql.Account.query().count()) == 0
 
+        # setup account categories
+        equity_acct_cat = run(asyncql.AccountCategory.insert({
+            'name': 'Equity',
+            'ledger_type': asyncql.LedgerType.PRESENT,
+            'destination': 'Balance Sheet',
+        }))
+        assert equity_acct_cat is not None
+        assert run(asyncql.AccountCategory.find(equity_acct_cat.id)) is not None
+        asset_acct_cat = run(asyncql.AccountCategory.insert({
+            'name': 'Asset',
+            'ledger_type': asyncql.LedgerType.PRESENT,
+            'destination': 'Balance Sheet',
+        }))
+        liability_acct_cat = run(asyncql.AccountCategory.insert({
+            'name': 'Liability',
+            'ledger_type': asyncql.LedgerType.PRESENT,
+            'destination': 'Balance Sheet',
+        }))
+
         # setup identity, currency, ledger, and some accounts
         identity = run(asyncql.Identity.insert({'name': 'Test Man'}))
         currency = run(asyncql.Currency.insert({
@@ -60,21 +80,25 @@ class TestAsyncBasicE2E(unittest.TestCase):
             'name': 'General Ledger',
             'identity_id': identity.id,
             'currency_id': currency.id,
+            'type': asyncql.LedgerType.PRESENT,
         }))
         equity_acct = run(asyncql.Account.insert({
             'name': 'General Equity',
             'type': asyncql.AccountType.EQUITY,
             'ledger_id': ledger.id,
+            'category_id': equity_acct_cat.id,
         }))
         asset_acct = run(asyncql.Account.insert({
             'name': 'General Asset',
             'type': asyncql.AccountType.ASSET,
             'ledger_id': ledger.id,
+            'category_id': asset_acct_cat.id,
         }))
         liability_acct = run(asyncql.Account.insert({
             'name': 'General Liability',
             'type': asyncql.AccountType.LIABILITY,
             'ledger_id': ledger.id,
+            'category_id': liability_acct_cat.id,
         }))
 
         # make sub account
@@ -90,6 +114,12 @@ class TestAsyncBasicE2E(unittest.TestCase):
         run(liability_acct.children().reload())
         assert len(liability_acct.children) == 1
         assert liability_acct.children[0].id == liability_sub_acct.id
+
+        assert equity_acct.category.id == equity_acct_cat.id
+        assert asset_acct.category.id == asset_acct_cat.id
+        assert liability_acct.category.id == liability_acct_cat.id
+
+        assert len(liability_acct_cat.accounts) == 1, liability_acct_cat.accounts
 
         # make a vendor and a customer
         vendor = asyncql.Vendor({'name': 'Vendor-san', 'code': '1530'})

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sqloquent import SqlModel, RelatedModel, RelatedCollection
+from sqloquent import SqlModel, RelatedModel, RelatedCollection, QueryBuilderProtocol
 from .AccountType import AccountType
 from .Entry import Entry
 from .EntryType import EntryType
@@ -12,7 +12,7 @@ class Account(SqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'name', 'type', 'ledger_id', 'parent_id', 'code',
-        'category', 'details'
+        'category_id', 'details'
     )
     id: str
     name: str
@@ -20,10 +20,11 @@ class Account(SqlModel):
     ledger_id: str
     parent_id: str
     code: str|None
-    category: str|None
+    category_id: str|None
     details: bytes|None
     ledger: RelatedModel
     parent: RelatedModel
+    category: RelatedModel
     children: RelatedCollection
     entries: RelatedCollection
 
@@ -49,8 +50,10 @@ class Account(SqlModel):
 
     @staticmethod
     def _encode(data: dict|None) -> dict|None:
+        """Encode Account data without modifying the original dict."""
         if type(data) is not dict:
             return data
+        data = {**data}
         if type(data.get('type', None)) is AccountType:
             data['type'] = data['type'].value
         return data
@@ -60,6 +63,24 @@ class Account(SqlModel):
         """Ensure data is encoded before inserting."""
         result = super().insert(cls._encode(data))
         return result
+
+    @classmethod
+    def insert_many(cls, items: list[dict], /, *, suppress_events: bool = False) -> int:
+        """Ensure items are encoded before inserting."""
+        items = [cls._encode(item) for item in items]
+        return super().insert_many(items, suppress_events=suppress_events)
+
+    def update(self, updates: dict, /, *, suppress_events: bool = False) -> Account:
+        """Ensure updates are encoded before updating."""
+        updates = self._encode(updates)
+        return super().update(updates, suppress_events=suppress_events)
+
+    @classmethod
+    def query(cls, conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:
+        """Ensure conditions are encoded before querying."""
+        if conditions and type(conditions.get('type', None)) is AccountType:
+            conditions['type'] = conditions['type'].value
+        return super().query(conditions, connection_info)
 
     def balance(self, include_sub_accounts: bool = True) -> int:
         """Tally all entries for this account. Includes the balances of

@@ -19,6 +19,7 @@ class TestBasicE2E(unittest.TestCase):
         models.Customer.connection_info = DB_FILEPATH
         models.Ledger.connection_info = DB_FILEPATH
         models.Account.connection_info = DB_FILEPATH
+        models.AccountCategory.connection_info = DB_FILEPATH
         models.Entry.connection_info = DB_FILEPATH
         models.Transaction.connection_info = DB_FILEPATH
         models.Vendor.connection_info = DB_FILEPATH
@@ -48,6 +49,25 @@ class TestBasicE2E(unittest.TestCase):
         assert models.Account.query().count() == 0
         assert models.Entry.query().count() == 0
 
+        # setup account categories
+        equity_acct_cat = models.AccountCategory.insert({
+            'name': 'Equity',
+            'ledger_type': models.LedgerType.PRESENT,
+            'destination': 'Balance Sheet',
+        })
+        assert equity_acct_cat is not None
+        assert models.AccountCategory.find(equity_acct_cat.id) is not None
+        asset_acct_cat = models.AccountCategory.insert({
+            'name': 'Asset',
+            'ledger_type': models.LedgerType.PRESENT,
+            'destination': 'Balance Sheet',
+        })
+        liability_acct_cat = models.AccountCategory.insert({
+            'name': 'Liability',
+            'ledger_type': models.LedgerType.PRESENT,
+            'destination': 'Balance Sheet',
+        })
+
         # setup identity, currency, ledger, and some accounts
         identity = models.Identity.insert({'name': 'Test Man'})
         currency = models.Currency.insert({
@@ -61,22 +81,32 @@ class TestBasicE2E(unittest.TestCase):
             'name': 'General Ledger',
             'identity_id': identity.id,
             'currency_id': currency.id,
+            'type': models.LedgerType.PRESENT,
         })
         equity_acct = models.Account.insert({
             'name': 'General Equity',
             'type': models.AccountType.EQUITY,
             'ledger_id': ledger.id,
+            'category_id': equity_acct_cat.id,
         })
         asset_acct = models.Account.insert({
             'name': 'General Asset',
             'type': models.AccountType.ASSET,
             'ledger_id': ledger.id,
+            'category_id': asset_acct_cat.id,
         })
         liability_acct = models.Account.insert({
             'name': 'General Liability',
             'type': models.AccountType.LIABILITY,
             'ledger_id': ledger.id,
+            'category_id': liability_acct_cat.id,
         })
+
+        assert equity_acct.category.id == equity_acct_cat.id
+        assert asset_acct.category.id == asset_acct_cat.id
+        assert liability_acct.category.id == liability_acct_cat.id
+
+        assert len(liability_acct_cat.accounts) == 1, liability_acct_cat.accounts
 
         # make sub account
         assert len(liability_acct.children) == 0

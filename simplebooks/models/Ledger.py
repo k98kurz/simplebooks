@@ -1,21 +1,32 @@
 from __future__ import annotations
 from .Account import Account, AccountType
-from sqloquent import SqlModel, RelatedModel, RelatedCollection
+from .LedgerType import LedgerType
+from sqloquent import SqlModel, RelatedModel, RelatedCollection, QueryBuilderProtocol
 
 
 class Ledger(SqlModel):
     connection_info: str = ''
     table: str = 'ledgers'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'name', 'identity_id', 'currency_id')
+    columns: tuple[str] = ('id', 'name', 'type', 'identity_id', 'currency_id')
     id: str
     name: str
+    type: str
     identity_id: str
     currency_id: str
     owner: RelatedModel
     currency: RelatedModel
     accounts: RelatedCollection
     transactions: RelatedCollection
+
+    @property
+    def type(self) -> LedgerType:
+        """The LedgerType of the Ledger."""
+        return LedgerType(self.data['type'])
+    @type.setter
+    def type(self, val: LedgerType):
+        if type(val) is LedgerType:
+            self.data['type'] = val.value
 
     def balances(self, reload: bool = False) -> dict[str, tuple[int, AccountType]]:
         """Return a dict mapping account ids to their balances. Accounts
@@ -30,14 +41,34 @@ class Ledger(SqlModel):
         return balances
 
     @classmethod
-    def find(cls, id: str) -> Ledger:
-        # """For better type hints."""
-        return super().find(id)
+    def _encode(cls, data: dict) -> dict:
+        """Encode Ledger data without modifying the original dict."""
+        if not isinstance(data, dict):
+            return data
+        data = {**data}
+        if isinstance(data.get('type', None), LedgerType):
+            data['type'] = data['type'].value
+        return data
 
     @classmethod
     def insert(cls, data: dict) -> Ledger | None:
-        # """For better type hints."""
-        return super().insert(data)
+        """Ensure data is encoded before inserting."""
+        return super().insert(cls._encode(data))
+
+    @classmethod
+    def insert_many(cls, items: list[dict], /, *, suppress_events: bool = False) -> int:
+        """Ensure items are encoded before inserting."""
+        items = [cls._encode(item) for item in items]
+        return super().insert_many(items, suppress_events=suppress_events)
+
+    def update(self, updates: dict, /, *, suppress_events: bool = False) -> Ledger:
+        """Ensure updates are encoded before updating."""
+        return super().update(self._encode(updates), suppress_events=suppress_events)
+
+    @classmethod
+    def query(cls, conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:
+        """Ensure conditions are encoded before querying."""
+        return super().query(cls._encode(conditions), connection_info)
 
     def setup_basic_accounts(self) -> list[Account]:
         """Creates and returns a list of 3 unsaved Accounts covering the
