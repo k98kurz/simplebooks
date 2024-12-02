@@ -78,10 +78,11 @@ Ensure conditions are encoded properly before querying.
 - ledger_id: str
 - parent_id: str
 - code: str | None
-- category: str | None
+- category_id: str | None
 - details: bytes | None
 - ledger: AsyncRelatedModel
 - parent: AsyncRelatedModel
+- category: AsyncRelatedModel
 - children: AsyncRelatedCollection
 - entries: AsyncRelatedCollection
 
@@ -95,6 +96,8 @@ fails.
 check fails.
 - parent: The related Account. Setting raises TypeError if the precondition
 check fails.
+- category: The related AccountCategory. Setting raises TypeError if the
+precondition check fails.
 - entries: The related Entrys. Setting raises TypeError if the precondition
 check fails.
 
@@ -104,10 +107,69 @@ check fails.
 
 Ensure data is encoded before inserting.
 
+##### `@classmethod async insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
+
+Ensure items are encoded before inserting.
+
+##### `async update(updates: dict, /, *, suppress_events: bool = False) -> Account:`
+
+Ensure updates are encoded before updating.
+
+##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> AsyncQueryBuilderProtocol:`
+
+Ensure conditions are encoded before querying.
+
 ##### `async balance(include_sub_accounts: bool = True) -> int:`
 
 Tally all entries for this account. Includes the balances of all sub-accounts if
 include_sub_accounts is True.
+
+### `LedgerType(Enum)`
+
+Enum of valid ledger types: PRESENT and FUTURE for cash and accrual accounting,
+respectively.
+
+### `AccountCategory(AsyncSqlModel)`
+
+#### Annotations
+
+- table: str
+- id_column: str
+- columns: tuple[str]
+- id: str
+- name: str
+- query_builder_class: Type[AsyncQueryBuilderProtocol]
+- connection_info: str
+- data: dict
+- data_original: MappingProxyType
+- _event_hooks: dict[str, list[Callable]]
+- ledger_type: str | None
+- destination: str
+- accounts: AsyncRelatedCollection
+
+#### Properties
+
+- ledger_type: The LedgerType that this AccountCategory applies to, if any.
+- accounts: The related Accounts. Setting raises TypeError if the precondition
+check fails.
+
+#### Methods
+
+##### `@classmethod async insert(data: dict, /, *, suppress_events: bool = False) -> AccountCategory | None:`
+
+Ensure data is encoded before inserting.
+
+##### `@classmethod async insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
+
+Ensure items are encoded before inserting.
+
+##### `async update(updates: dict, /, *, suppress_events: bool = False) -> AccountCategory:`
+
+Ensure updates are encoded before updating.
+
+##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:`
+
+Ensure conditions are encoded before querying.
 
 ### `Currency(AsyncSqlModel)`
 
@@ -182,6 +244,7 @@ Format an amount using the correct number of decimal_places.
 - data: dict
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
+- type: str
 - identity_id: str
 - currency_id: str
 - owner: AsyncRelatedModel
@@ -191,6 +254,7 @@ Format an amount using the correct number of decimal_places.
 
 #### Properties
 
+- type: The LedgerType of the Ledger.
 - owner: The related Identity. Setting raises TypeError if the precondition
 check fails.
 - currency: The related Currency. Setting raises TypeError if the precondition
@@ -201,6 +265,22 @@ check fails.
 precondition check fails.
 
 #### Methods
+
+##### `@classmethod async insert(data: dict) -> Ledger | None:`
+
+Ensure data is encoded before inserting.
+
+##### `@classmethod async insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
+
+Ensure items are encoded before inserting.
+
+##### `async update(updates: dict, /, *, parallel_events: bool = False, suppress_events: bool = False) -> Ledger:`
+
+Ensure updates are encoded before updating.
+
+##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> AsyncQueryBuilderProtocol:`
+
+Ensure conditions are encoded before querying.
 
 ##### `async balances(reload: bool = False) -> dict[str, tuple[int, AccountType]]:`
 

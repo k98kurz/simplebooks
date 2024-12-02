@@ -20,10 +20,11 @@
 - ledger_id: str
 - parent_id: str
 - code: str | None
-- category: str | None
+- category_id: str | None
 - details: bytes | None
 - ledger: RelatedModel
 - parent: RelatedModel
+- category: RelatedModel
 - children: RelatedCollection
 - entries: RelatedCollection
 
@@ -37,6 +38,8 @@ fails.
 check fails.
 - parent: The related Account. Setting raises TypeError if the precondition
 check fails.
+- category: The related AccountCategory. Setting raises TypeError if the
+precondition check fails.
 - entries: The related Entrys. Setting raises TypeError if the precondition
 check fails.
 
@@ -46,10 +49,64 @@ check fails.
 
 Ensure data is encoded before inserting.
 
+##### `@classmethod insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
+
+Ensure items are encoded before inserting.
+
+##### `update(updates: dict, /, *, suppress_events: bool = False) -> Account:`
+
+Ensure updates are encoded before updating.
+
+##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:`
+
+Ensure conditions are encoded before querying.
+
 ##### `balance(include_sub_accounts: bool = True) -> int:`
 
 Tally all entries for this account. Includes the balances of all sub-accounts if
 include_sub_accounts is True.
+
+### `AccountCategory(SqlModel)`
+
+#### Annotations
+
+- table: str
+- id_column: str
+- columns: tuple[str]
+- id: str
+- name: str
+- query_builder_class: Type[QueryBuilderProtocol]
+- connection_info: str
+- data: dict
+- data_original: MappingProxyType
+- _event_hooks: dict[str, list[Callable]]
+- ledger_type: str | None
+- destination: str
+- accounts: RelatedCollection
+
+#### Properties
+
+- ledger_type: The LedgerType that this AccountCategory applies to, if any.
+- accounts: The related Accounts. Setting raises TypeError if the precondition
+check fails.
+
+#### Methods
+
+##### `@classmethod insert(data: dict, /, *, suppress_events: bool = False) -> AccountCategory | None:`
+
+Ensure data is encoded before inserting.
+
+##### `@classmethod insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
+
+Ensure items are encoded before inserting.
+
+##### `update(updates: dict, /, *, suppress_events: bool = False) -> AccountCategory:`
+
+Ensure updates are encoded before updating.
+
+##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:`
+
+Ensure conditions are encoded before querying.
 
 ### `AccountType(Enum)`
 
@@ -212,6 +269,7 @@ Return the public data for cloning the Identity.
 - data: dict
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
+- type: str
 - identity_id: str
 - currency_id: str
 - owner: RelatedModel
@@ -221,6 +279,7 @@ Return the public data for cloning the Identity.
 
 #### Properties
 
+- type: The LedgerType of the Ledger.
 - owner: The related Identity. Setting raises TypeError if the precondition
 check fails.
 - currency: The related Currency. Setting raises TypeError if the precondition
@@ -238,9 +297,21 @@ Return a dict mapping account ids to their balances. Accounts with sub-accounts
 will not include the sub-account balances; the sub-account balances will be
 returned separately.
 
-##### `@classmethod find(id: str) -> Ledger:`
-
 ##### `@classmethod insert(data: dict) -> Ledger | None:`
+
+Ensure data is encoded before inserting.
+
+##### `@classmethod insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
+
+Ensure items are encoded before inserting.
+
+##### `update(updates: dict, /, *, suppress_events: bool = False) -> Ledger:`
+
+Ensure updates are encoded before updating.
+
+##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:`
+
+Ensure conditions are encoded before querying.
 
 ##### `setup_basic_accounts() -> list[Account]:`
 
