@@ -21,7 +21,7 @@ classifiers = [
   "Topic :: Office/Business :: Financial :: Accounting",
 ]
 dependencies = [
-  "sqloquent >= 0.5.3",
+  "sqloquent >= 0.6.2",
 ]
 
 [project.urls]
@@ -30,7 +30,7 @@ dependencies = [
 
 [project.optional-dependencies]
 asyncql = [
-  "sqloquent[asyncql] >= 0.5.3",
+  "sqloquent[asyncql] >= 0.6.2",
 ]
 docs = [
   "autodox >= 0.1.16"
