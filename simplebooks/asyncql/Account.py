@@ -1,7 +1,7 @@
 from __future__ import annotations
 from sqloquent.asyncql import (
     AsyncSqlModel, AsyncRelatedModel, AsyncRelatedCollection,
-    AsyncQueryBuilderProtocol,
+    AsyncQueryBuilderProtocol, Default,
 )
 from .AccountType import AccountType
 from .Entry import Entry
@@ -15,7 +15,7 @@ class Account(AsyncSqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'name', 'type', 'ledger_id', 'parent_id', 'code',
-        'category_id', 'details'
+        'category_id', 'details', 'active'
     )
     id: str
     name: str
@@ -25,6 +25,7 @@ class Account(AsyncSqlModel):
     code: str|None
     category_id: str|None
     details: bytes|None
+    active: bool|Default[True]
     ledger: AsyncRelatedModel
     parent: AsyncRelatedModel
     category: AsyncRelatedModel

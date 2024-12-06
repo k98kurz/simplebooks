@@ -1,5 +1,8 @@
 from __future__ import annotations
-from sqloquent import SqlModel, RelatedModel, RelatedCollection, QueryBuilderProtocol
+from sqloquent import (
+    SqlModel, RelatedModel, RelatedCollection, QueryBuilderProtocol,
+    Default,
+)
 from .AccountType import AccountType
 from .Entry import Entry
 from .EntryType import EntryType
@@ -12,7 +15,7 @@ class Account(SqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'name', 'type', 'ledger_id', 'parent_id', 'code',
-        'category_id', 'details'
+        'category_id', 'details', 'active'
     )
     id: str
     name: str
@@ -22,6 +25,7 @@ class Account(SqlModel):
     code: str|None
     category_id: str|None
     details: bytes|None
+    active: bool|Default[True]
     ledger: RelatedModel
     parent: RelatedModel
     category: RelatedModel
