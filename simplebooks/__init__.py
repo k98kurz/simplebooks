@@ -16,7 +16,7 @@ import sqloquent.tools
 from typing import Callable
 
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 def set_connection_info(db_file_path: str):
     """Set the connection info for all models to use the specified
