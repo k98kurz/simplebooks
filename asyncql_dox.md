@@ -80,6 +80,7 @@ Ensure conditions are encoded properly before querying.
 - code: str | None
 - category_id: str | None
 - details: bytes | None
+- active: bool | Default[True]
 - ledger: AsyncRelatedModel
 - parent: AsyncRelatedModel
 - category: AsyncRelatedModel
@@ -403,5 +404,4 @@ Validate the transaction, save the entries, then save the transaction.
 
 Set the connection info for all models to use the specified sqlite3 database
 file path.
-
 
