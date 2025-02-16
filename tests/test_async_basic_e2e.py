@@ -14,15 +14,7 @@ MIGRATIONS_PATH = 'tests/migrations'
 class TestAsyncBasicE2E(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        asyncql.Identity.connection_info = DB_FILEPATH
-        asyncql.Currency.connection_info = DB_FILEPATH
-        asyncql.Ledger.connection_info = DB_FILEPATH
-        asyncql.Account.connection_info = DB_FILEPATH
-        asyncql.AccountCategory.connection_info = DB_FILEPATH
-        asyncql.Entry.connection_info = DB_FILEPATH
-        asyncql.Transaction.connection_info = DB_FILEPATH
-        asyncql.Vendor.connection_info = DB_FILEPATH
-        asyncql.Customer.connection_info = DB_FILEPATH
+        asyncql.set_connection_info(DB_FILEPATH)
         super().setUpClass()
 
     def setUp(self):

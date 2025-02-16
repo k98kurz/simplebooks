@@ -14,15 +14,7 @@ MIGRATIONS_PATH = 'tests/migrations'
 class TestBasicE2E(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        models.Identity.connection_info = DB_FILEPATH
-        models.Currency.connection_info = DB_FILEPATH
-        models.Customer.connection_info = DB_FILEPATH
-        models.Ledger.connection_info = DB_FILEPATH
-        models.Account.connection_info = DB_FILEPATH
-        models.AccountCategory.connection_info = DB_FILEPATH
-        models.Entry.connection_info = DB_FILEPATH
-        models.Transaction.connection_info = DB_FILEPATH
-        models.Vendor.connection_info = DB_FILEPATH
+        simplebooks.set_connection_info(DB_FILEPATH)
         super().setUpClass()
 
     def setUp(self):
