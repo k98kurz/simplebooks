@@ -1,10 +1,8 @@
 from __future__ import annotations
-from hashlib import sha256
 from sqloquent import SqlModel, RelatedCollection
 from sqloquent.errors import vert, tert
-from .Account import Account, AccountType
+from .ArchivedTransaction import ArchivedTransaction
 from .Entry import Entry, EntryType
-from .Identity import Identity
 import packify
 
 
@@ -20,6 +18,7 @@ class Transaction(SqlModel):
     details: bytes
     entries: RelatedCollection
     ledgers: RelatedCollection
+    statements: RelatedCollection
 
     # override automatic properties
     @property
@@ -119,3 +118,12 @@ class Transaction(SqlModel):
         for e in self.entries:
             e.save()
         return super().save()
+
+    def archive(self) -> ArchivedTransaction:
+        """Archive the Transaction. If it has already been archived,
+            return the existing ArchivedTransaction.
+        """
+        try:
+            return ArchivedTransaction.insert({**self.data})
+        except Exception as e:
+            return ArchivedTransaction.find(self.id)

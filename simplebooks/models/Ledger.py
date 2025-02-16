@@ -18,6 +18,8 @@ class Ledger(SqlModel):
     currency: RelatedModel
     accounts: RelatedCollection
     transactions: RelatedCollection
+    archived_transactions: RelatedCollection
+    statements: RelatedCollection
 
     @property
     def type(self) -> LedgerType:

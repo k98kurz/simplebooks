@@ -2,6 +2,8 @@ from .models import (
     Account,
     AccountCategory,
     AccountType,
+    ArchivedEntry,
+    ArchivedTransaction,
     Currency,
     Customer,
     Entry,
@@ -9,6 +11,7 @@ from .models import (
     Identity,
     Ledger,
     LedgerType,
+    Statement,
     Transaction,
     Vendor,
 )
@@ -16,7 +19,11 @@ import sqloquent.tools
 from typing import Callable
 
 
-__version__ = '0.2.3'
+__version__ = '0.3.0'
+
+def version() -> str:
+    return __version__
+
 
 def set_connection_info(db_file_path: str):
     """Set the connection info for all models to use the specified
@@ -24,11 +31,14 @@ def set_connection_info(db_file_path: str):
     """
     Account.connection_info = db_file_path
     AccountCategory.connection_info = db_file_path
+    ArchivedEntry.connection_info = db_file_path
+    ArchivedTransaction.connection_info = db_file_path
     Currency.connection_info = db_file_path
     Customer.connection_info = db_file_path
     Entry.connection_info = db_file_path
     Identity.connection_info = db_file_path
     Ledger.connection_info = db_file_path
+    Statement.connection_info = db_file_path
     Transaction.connection_info = db_file_path
     Vendor.connection_info = db_file_path
 
@@ -37,11 +47,14 @@ def get_migrations() -> dict[str, str]:
     models = [
         Account,
         AccountCategory,
+        ArchivedEntry,
+        ArchivedTransaction,
         Currency,
         Customer,
         Entry,
         Identity,
         Ledger,
+        Statement,
         Transaction,
         Vendor,
     ]

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from sqloquent import SqlModel, RelatedModel, RelatedCollection, QueryBuilderProtocol
+from .ArchivedEntry import ArchivedEntry
 from .EntryType import EntryType
 import packify
 
@@ -73,3 +74,12 @@ class Entry(SqlModel):
     def query(cls, conditions: dict = None) -> QueryBuilderProtocol:
         """Ensure conditions are encoded properly before querying."""
         return super().query(cls._encode(conditions))
+
+    def archive(self) -> ArchivedEntry|None:
+        """Archive the Entry. If it has already been archived,
+            return the existing ArchivedEntry.
+        """
+        try:
+            return ArchivedEntry.insert({**self.data})
+        except Exception as e:
+            return ArchivedEntry.find(self.id)

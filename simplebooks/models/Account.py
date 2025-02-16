@@ -31,6 +31,7 @@ class Account(SqlModel):
     category: RelatedModel
     children: RelatedCollection
     entries: RelatedCollection
+    archived_entries: RelatedCollection
 
     # override automatic property
     @property
@@ -86,7 +87,8 @@ class Account(SqlModel):
             conditions['type'] = conditions['type'].value
         return super().query(conditions, connection_info)
 
-    def balance(self, include_sub_accounts: bool = True) -> int:
+    def balance(self, include_sub_accounts: bool = True,
+                previous_balances: dict[str, tuple[EntryType, int]] = {}) -> int:
         """Tally all entries for this account. Includes the balances of
             all sub-accounts if include_sub_accounts is True.
         """
@@ -95,6 +97,12 @@ class Account(SqlModel):
             EntryType.DEBIT: 0,
             'subaccounts': 0,
         }
+        if self.id in previous_balances:
+            if previous_balances[self.id][0] == EntryType.CREDIT:
+                totals[EntryType.CREDIT] = previous_balances[self.id][1]
+            else:
+                totals[EntryType.DEBIT] = previous_balances[self.id][1]
+
         for entries in self.entries().query().chunk(500):
             entry: Entry
             for entry in entries:
@@ -102,7 +110,11 @@ class Account(SqlModel):
 
         if include_sub_accounts:
             for acct in self.children:
-                totals['subaccounts'] += acct.balance(include_sub_accounts=True)
+                acct: Account
+                totals['subaccounts'] += acct.balance(
+                    include_sub_accounts=True,
+                    previous_balances=previous_balances
+                )
 
         if self.type in (
             AccountType.ASSET, AccountType.DEBIT_BALANCE,
