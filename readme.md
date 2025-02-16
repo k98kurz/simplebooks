@@ -160,7 +160,7 @@ python tests/test_misc.py
 
 ## Personal, Non-commercial Use License
 
-Copyright (c) 2024 Jonathan Voss (k98kurz)
+Copyright (c) 2025 Jonathan Voss (k98kurz)
 
 Permission to use, copy, modify, and/or distribute this software
 for any personal, non-commercial purpose is hereby granted, provided
