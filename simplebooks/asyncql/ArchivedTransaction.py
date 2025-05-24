@@ -1,15 +1,16 @@
 from __future__ import annotations
-from hashlib import sha256
 from sqloquent.asyncql import AsyncSqlModel, AsyncRelatedCollection
-from sqloquent.errors import vert, tert
-from .ArchivedTransaction import ArchivedTransaction
-from .Entry import Entry, EntryType
+from sqloquent.errors import vert
+from .ArchivedEntry import ArchivedEntry, EntryType
 import packify
 
 
-class Transaction(AsyncSqlModel):
+_empty_dict = packify.pack({})
+
+
+class ArchivedTransaction(AsyncSqlModel):
     connection_info: str = ''
-    table: str = 'transactions'
+    table: str = 'archived_transactions'
     id_column: str = 'id'
     columns: tuple[str] = ('id', 'entry_ids', 'ledger_ids', 'timestamp', 'details')
     id: str
@@ -19,12 +20,13 @@ class Transaction(AsyncSqlModel):
     details: bytes
     entries: AsyncRelatedCollection
     ledgers: AsyncRelatedCollection
+    statements: AsyncRelatedCollection
 
     # override automatic properties
     @property
     def details(self) -> dict[str, bytes]:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', b'd\x00\x00\x00\x00'))
+        return packify.unpack(self.data.get('details', _empty_dict))
     @details.setter
     def details(self, val: dict[str, bytes]):
         if type(val) is not dict:
@@ -42,45 +44,6 @@ class Transaction(AsyncSqlModel):
             data['details'] = packify.pack(data.get('details', {}))
         return data
 
-    @classmethod
-    async def prepare(cls, entries: list[Entry], timestamp: str,
-                      details: packify.SerializableType = None,
-                      reload: bool = False) -> Transaction:
-        """Prepare a transaction. Raises TypeError for invalid arguments.
-            Raises ValueError if the entries do not balance for each
-            ledger; if a required auth script is missing; or if any of
-            the entries is contained within an existing Transaction.
-            Entries and Transaction will have IDs generated but will not
-            be persisted to the database and must be saved separately.
-        """
-        tert(type(entries) is list and all([type(e) is Entry for e in entries]),
-            'entries must be list[Entry]')
-        tert(type(timestamp) is str, 'timestamp must be str')
-
-        ledgers = set()
-        for entry in entries:
-            entry.id = entry.id if entry.id else entry.generate_id()
-            if reload:
-                await entry.account().reload()
-            vert(await Transaction.query().contains('entry_ids', entry.id).count() == 0,
-                 f"entry {entry.id} is already contained within a Transaction")
-            ledgers.add(entry.account.ledger_id)
-
-        txn = cls({
-            'entry_ids': ",".join(sorted([
-                e.id if e.id else e.generate_id()
-                for e in entries
-            ])),
-            'ledger_ids': ",".join(sorted(list(ledgers))),
-            'timestamp': timestamp,
-        })
-        txn.details = details
-        txn.entries = entries
-        assert await txn.validate(reload), \
-            'transaction validation failed'
-        txn.id = txn.generate_id()
-        return txn
-
     async def validate(self, reload: bool = False) -> bool:
         """Determines if a Transaction is valid using the rules of accounting.
             Raises TypeError for invalid arguments. Raises ValueError if the
@@ -93,7 +56,7 @@ class Transaction(AsyncSqlModel):
 
         # first check that all ledgers balance
         ledgers = {}
-        entry: Entry
+        entry: ArchivedEntry
         for entry in self.entries:
             if reload:
                 await entry.account().reload()
@@ -110,7 +73,7 @@ class Transaction(AsyncSqlModel):
 
         return True
 
-    async def save(self, reload: bool = False) -> Transaction:
+    async def save(self, reload: bool = False) -> ArchivedTransaction:
         """Validate the transaction, save the entries, then save the
             transaction.
         """
@@ -118,13 +81,4 @@ class Transaction(AsyncSqlModel):
         for e in self.entries:
             await e.save()
         return await super().save()
-
-    async def archive(self) -> ArchivedTransaction:
-        """Archive the Transaction. If it has already been archived,
-            return the existing ArchivedTransaction.
-        """
-        try:
-            return await ArchivedTransaction.insert({**self.data})
-        except Exception as e:
-            return await ArchivedTransaction.find(self.id)
 

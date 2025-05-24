@@ -2,14 +2,16 @@ from __future__ import annotations
 from sqloquent.asyncql import (
     AsyncSqlModel, AsyncRelatedModel, AsyncRelatedCollection, AsyncQueryBuilderProtocol
 )
-from .ArchivedEntry import ArchivedEntry
 from .EntryType import EntryType
 import packify
 
 
-class Entry(AsyncSqlModel):
+_None = packify.pack(None)
+
+
+class ArchivedEntry(AsyncSqlModel):
     connection_info: str = ''
-    table: str = 'entries'
+    table: str = 'archived_entries'
     id_column: str = 'id'
     columns: tuple[str] = ('id', 'type', 'amount', 'nonce', 'account_id', 'details')
     id: str
@@ -39,7 +41,7 @@ class Entry(AsyncSqlModel):
     @property
     def details(self) -> packify.SerializableType:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', b'n\x00\x00\x00\x00'))
+        return packify.unpack(self.data.get('details', _None))
     @details.setter
     def details(self, val: packify.SerializableType):
         self.data['details'] = packify.pack(val)
@@ -60,17 +62,8 @@ class Entry(AsyncSqlModel):
             data['amount'] = int(data['amount'])
         return data
 
-    @staticmethod
-    def parse(models: Entry|list[Entry]) -> Entry|list[Entry]:
-        if type(models) is list:
-            for model in models:
-                model.data = Entry._parse(model.data)
-        else:
-            models.data = Entry._parse(models.data)
-        return models
-
     @classmethod
-    async def insert(cls, data: dict) -> Entry | None:
+    async def insert(cls, data: dict) -> ArchivedEntry | None:
         """Ensure data is encoded before inserting."""
         result = await super().insert(cls._encode(data))
         return result
@@ -78,20 +71,11 @@ class Entry(AsyncSqlModel):
     @classmethod
     async def insert_many(cls, items: list[dict]) -> int:
         """Ensure data is encoded before inserting."""
-        items = [Entry._encode(data) for data in list]
+        items = [cls._encode(data) for data in list]
         return await super().insert_many(items)
 
     @classmethod
     def query(cls, conditions: dict = None) -> AsyncQueryBuilderProtocol:
         """Ensure conditions are encoded properly before querying."""
         return super().query(cls._encode(conditions))
-
-    async def archive(self) -> ArchivedEntry|None:
-        """Archive the Entry. If it has already been archived,
-            return the existing ArchivedEntry.
-        """
-        try:
-            return await ArchivedEntry.insert({**self.data})
-        except Exception as e:
-            return await ArchivedEntry.find(self.id)
 
