@@ -16,9 +16,10 @@ Once all other issues are complete, prepare to release the next version.
 - [ ] Review and update docstrings
   - [ ] `models/*.py`
   - [ ] `asyncql/*.py`
-- [ ] Update dox.md
-- [ ] Update readme.md
-- [ ] Update changelog.md
+- [ ] Update `dox.md`
+- [ ] Update `asyncql_dox.md`
+- [ ] Update `readme.md`
+- [ ] Update `changelog.md`
 - [ ] Review and finalize documentation
 - [ ] Ensure version strings are set to `'M.m.p'`
   - `version.py`
