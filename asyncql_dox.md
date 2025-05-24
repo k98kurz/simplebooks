@@ -11,6 +11,51 @@ LIABILITY, EQUITY, CONTRA_LIABILITY, CONTRA_EQUITY.
 
 Enum of valid Entry types: CREDIT and DEBIT.
 
+### `ArchivedEntry(AsyncSqlModel)`
+
+#### Annotations
+
+- table: str
+- id_column: str
+- columns: tuple[str]
+- id: str
+- name: str
+- query_builder_class: Type[AsyncQueryBuilderProtocol]
+- connection_info: str
+- data: dict
+- data_original: MappingProxyType
+- _event_hooks: dict[str, list[Callable]]
+- type: str
+- amount: int
+- nonce: bytes
+- account_id: str
+- details: bytes
+- account: AsyncRelatedModel
+- transactions: AsyncRelatedCollection
+
+#### Properties
+
+- type: The EntryType of the Entry.
+- details: A packify.SerializableType stored in the database as a blob.
+- transactions: The related ArchivedTransactions. Setting raises TypeError if
+the precondition check fails.
+- account: The related Account. Setting raises TypeError if the precondition
+check fails.
+
+#### Methods
+
+##### `@classmethod async insert(data: dict) -> ArchivedEntry | None:`
+
+Ensure data is encoded before inserting.
+
+##### `@classmethod async insert_many(items: list[dict]) -> int:`
+
+Ensure data is encoded before inserting.
+
+##### `@classmethod query(conditions: dict = None) -> AsyncQueryBuilderProtocol:`
+
+Ensure conditions are encoded properly before querying.
+
 ### `Entry(AsyncSqlModel)`
 
 #### Annotations
@@ -44,8 +89,6 @@ precondition check fails.
 
 #### Methods
 
-##### `__hash__() -> int:`
-
 ##### `@staticmethod parse(models: Entry | list[Entry]) -> Entry | list[Entry]:`
 
 ##### `@classmethod async insert(data: dict) -> Entry | None:`
@@ -59,6 +102,11 @@ Ensure data is encoded before inserting.
 ##### `@classmethod query(conditions: dict = None) -> AsyncQueryBuilderProtocol:`
 
 Ensure conditions are encoded properly before querying.
+
+##### `async archive() -> ArchivedEntry | None:`
+
+Archive the Entry. If it has already been archived, return the existing
+ArchivedEntry.
 
 ### `Account(AsyncSqlModel)`
 
@@ -86,6 +134,7 @@ Ensure conditions are encoded properly before querying.
 - category: AsyncRelatedModel
 - children: AsyncRelatedCollection
 - entries: AsyncRelatedCollection
+- archived_entries: AsyncRelatedCollection
 
 #### Properties
 
@@ -101,6 +150,8 @@ check fails.
 precondition check fails.
 - entries: The related Entrys. Setting raises TypeError if the precondition
 check fails.
+- archived_entries: The related ArchivedEntrys. Setting raises TypeError if the
+precondition check fails.
 
 #### Methods
 
@@ -120,7 +171,7 @@ Ensure updates are encoded before updating.
 
 Ensure conditions are encoded before querying.
 
-##### `async balance(include_sub_accounts: bool = True) -> int:`
+##### `async balance(include_sub_accounts: bool = True, previous_balances: dict[str, tuple[EntryType, int]] = {}) -> int:`
 
 Tally all entries for this account. Includes the balances of all sub-accounts if
 include_sub_accounts is True.
@@ -172,6 +223,52 @@ Ensure updates are encoded before updating.
 
 Ensure conditions are encoded before querying.
 
+### `ArchivedTransaction(AsyncSqlModel)`
+
+#### Annotations
+
+- table: str
+- id_column: str
+- columns: tuple[str]
+- id: str
+- name: str
+- query_builder_class: Type[AsyncQueryBuilderProtocol]
+- connection_info: str
+- data: dict
+- data_original: MappingProxyType
+- _event_hooks: dict[str, list[Callable]]
+- entry_ids: str
+- ledger_ids: str
+- timestamp: str
+- details: bytes
+- entries: AsyncRelatedCollection
+- ledgers: AsyncRelatedCollection
+- statements: AsyncRelatedCollection
+
+#### Properties
+
+- details: A packify.SerializableType stored in the database as a blob.
+- statements: The related Statements. Setting raises TypeError if the
+precondition check fails.
+- entries: The related ArchivedEntrys. Setting raises TypeError if the
+precondition check fails.
+- ledgers: The related Ledgers. Setting raises TypeError if the precondition
+check fails.
+
+#### Methods
+
+##### `async validate(reload: bool = False) -> bool:`
+
+Determines if a Transaction is valid using the rules of accounting. Raises
+TypeError for invalid arguments. Raises ValueError if the entries do not balance
+for each ledger; or if any of the entries is contained within an existing
+Transaction. If reload is set to True, entries and accounts will be reloaded
+from the database.
+
+##### `async save(reload: bool = False) -> ArchivedTransaction:`
+
+Validate the transaction, save the entries, then save the transaction.
+
 ### `Currency(AsyncSqlModel)`
 
 #### Annotations
@@ -192,6 +289,12 @@ Ensure conditions are encoded before querying.
 - unit_divisions: <class 'int'>
 - base: int | None
 - details: str | None
+- ledgers: <class 'sqloquent.asyncql.interfaces.AsyncRelatedCollection'>
+
+#### Properties
+
+- ledgers: The related Ledgers. Setting raises TypeError if the precondition
+check fails.
 
 #### Methods
 
@@ -264,6 +367,10 @@ check fails.
 check fails.
 - transactions: The related Transactions. Setting raises TypeError if the
 precondition check fails.
+- statements: The related Statements. Setting raises TypeError if the
+precondition check fails.
+- archived_transactions: The related ArchivedTransactions. Setting raises
+TypeError if the precondition check fails.
 
 #### Methods
 
@@ -354,6 +461,8 @@ Return the public data for cloning the Identity.
 check fails.
 - ledgers: The related Ledgers. Setting raises TypeError if the precondition
 check fails.
+- statements: The related Statements. Setting raises TypeError if the
+precondition check fails.
 
 #### Methods
 
@@ -376,6 +485,75 @@ from the database.
 ##### `async save(reload: bool = False) -> Transaction:`
 
 Validate the transaction, save the entries, then save the transaction.
+
+##### `async archive() -> ArchivedTransaction:`
+
+Archive the Transaction. If it has already been archived, return the existing
+ArchivedTransaction.
+
+### `Statement(AsyncSqlModel)`
+
+#### Annotations
+
+- table: str
+- id_column: str
+- columns: tuple[str]
+- id: str
+- name: str
+- query_builder_class: Type[AsyncQueryBuilderProtocol]
+- connection_info: str
+- data: dict
+- data_original: MappingProxyType
+- _event_hooks: dict[str, list[Callable]]
+- height: int
+- tx_ids: str
+- ledger_id: str
+- balances: bytes
+- timestamp: str
+- details: bytes
+- ledger: AsyncRelatedModel
+- transactions: AsyncRelatedCollection
+- archived_transactions: AsyncRelatedCollection
+
+#### Properties
+
+- tx_ids: A list of transaction IDs.
+- balances: A dict mapping account IDs to tuple[EntryType, int] balances.
+- ledger: The related Ledger. Setting raises TypeError if the precondition check
+fails.
+- transactions: The related Transactions. Setting raises TypeError if the
+precondition check fails.
+- archived_transactions: The related ArchivedTransactions. Setting raises
+TypeError if the precondition check fails.
+
+#### Methods
+
+##### `@classmethod calculate_balances(txns: list[Transaction | ArchivedTransaction], parent_balances: dict[str, tuple[EntryType, int]] | None = None, reload: bool = False) -> dict[str, tuple[EntryType, int]]:`
+
+Calculates the account balances for a list of rolled-up transactions. If
+parent_balances is provided, those are the starting balances to which the
+balances of the rolled-up transactions are added. If reload is True, the entries
+are reloaded from the database.
+
+##### `@classmethod async prepare(txns: list[Transaction | ArchivedTransaction], ledger: Ledger | None = None) -> Statement:`
+
+Prepare a statement by checking that all txns are for the same ledger and
+summarizing the net account balance changes from the transactions and the
+previous Statement. Raises TypeError if there are no txns and no ledger, or if
+the transactions are not all Transaction or ArchivedTransaction instances.
+Raises ValueError if the transactions are not all for the same ledger.
+
+##### `async validate(reload: bool = False) -> bool:`
+
+Validates that the balances are correct, and that the height is 1 + the height
+of the most recentStatement (if one exists).
+
+##### `async trim(archive: bool = True) -> None:`
+
+Trims the transactions and entries summarized in this Statement. Returns the
+number of transactions trimmed. If archive is True, the transactions and entries
+are archived before being deleted. Raises ValueError if the Statement is not
+valid.
 
 ### `Vendor(AsyncSqlModel)`
 
@@ -404,4 +582,5 @@ Validate the transaction, save the entries, then save the transaction.
 
 Set the connection info for all models to use the specified sqlite3 database
 file path.
+
 
