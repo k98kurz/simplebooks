@@ -1,5 +1,4 @@
 from __future__ import annotations
-from hashlib import sha256
 from sqloquent.asyncql import AsyncSqlModel, AsyncRelatedCollection
 from sqloquent.errors import vert, tert
 from .ArchivedTransaction import ArchivedTransaction
