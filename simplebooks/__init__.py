@@ -19,10 +19,5 @@ from .models import (
     publish_migrations,
     automigrate,
 )
-
-
-__version__ = '0.3.0'
-
-def version() -> str:
-    return __version__
+from .version import version
 
