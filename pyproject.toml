@@ -27,6 +27,7 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/k98kurz/simplebooks"
+"Repository" = "https://github.com/k98kurz/simplebooks"
 "Bug Tracker" = "https://github.com/k98kurz/simplebooks/issues"
 
 [project.optional-dependencies]
