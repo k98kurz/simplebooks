@@ -19,7 +19,7 @@ All initially planned features have been implemented and tested.
 Open issues can be found [here](https://github.com/k98kurz/simplebooks/issues).
 
 Previous changes can be found in the
-[changelog](https://github.com/k98kurz/simplebooksi/blob/master/changelog.md).
+[changelog](https://github.com/k98kurz/simplebooks/blob/master/changelog.md).
 
 The async implementation has an upstream issue from the sqloquent dependency
 that can be tracked [here](https://github.com/k98kurz/sqloquent/issues/16). Once
