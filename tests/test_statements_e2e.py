@@ -119,6 +119,9 @@ class TestStatementsE2E(unittest.TestCase):
         trimmed = stmt.trim()
         assert trimmed == 3, trimmed
 
+        # statement should not delete itself during a trim
+        assert models.Statement.find(stmt.id) is not None, 'Statement trimmed itself'
+
         # check balances without the Statement balances
         assert equity_acct.balance() == 0, equity_acct.balance()
         assert asset_acct.balance() == 0, asset_acct.balance()

@@ -127,3 +127,4 @@ class Transaction(SqlModel):
             return ArchivedTransaction.insert({**self.data})
         except Exception as e:
             return ArchivedTransaction.find(self.id)
+

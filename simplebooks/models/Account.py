@@ -9,6 +9,9 @@ from .EntryType import EntryType
 import packify
 
 
+_None = packify.pack(None)
+
+
 class Account(SqlModel):
     connection_info: str = ''
     table: str = 'accounts'
@@ -47,7 +50,7 @@ class Account(SqlModel):
     @property
     def details(self) -> packify.SerializableType:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', None) or b'n\x00\x00\x00\x00')
+        return packify.unpack(self.data.get('details', None) or _None)
     @details.setter
     def details(self, val: packify.SerializableType):
         if isinstance(val, packify.SerializableType):
@@ -70,25 +73,33 @@ class Account(SqlModel):
         return result
 
     @classmethod
-    def insert_many(cls, items: list[dict], /, *, suppress_events: bool = False) -> int:
+    def insert_many(
+            cls, items: list[dict], /, *, suppress_events: bool = False
+        ) -> int:
         """Ensure items are encoded before inserting."""
         items = [cls._encode(item) for item in items]
         return super().insert_many(items, suppress_events=suppress_events)
 
-    def update(self, updates: dict, /, *, suppress_events: bool = False) -> Account:
+    def update(
+            self, updates: dict, /, *, suppress_events: bool = False
+        ) -> Account:
         """Ensure updates are encoded before updating."""
         updates = self._encode(updates)
         return super().update(updates, suppress_events=suppress_events)
 
     @classmethod
-    def query(cls, conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:
+    def query(
+            cls, conditions: dict = None, connection_info: str = None
+    ) -> QueryBuilderProtocol:
         """Ensure conditions are encoded before querying."""
         if conditions and type(conditions.get('type', None)) is AccountType:
             conditions['type'] = conditions['type'].value
         return super().query(conditions, connection_info)
 
-    def balance(self, include_sub_accounts: bool = True,
-                previous_balances: dict[str, tuple[EntryType, int]] = {}) -> int:
+    def balance(
+            self, include_sub_accounts: bool = True,
+            previous_balances: dict[str, tuple[EntryType, int]] = {}
+        ) -> int:
         """Tally all entries for this account. Includes the balances of
             all sub-accounts if include_sub_accounts is True.
         """
@@ -113,7 +124,7 @@ class Account(SqlModel):
                 acct: Account
                 totals['subaccounts'] += acct.balance(
                     include_sub_accounts=True,
-                    previous_balances=previous_balances
+                    previous_balances=previous_balances,
                 )
 
         if self.type in (
@@ -123,3 +134,4 @@ class Account(SqlModel):
             return totals[EntryType.DEBIT] - totals[EntryType.CREDIT] + totals['subaccounts']
 
         return totals[EntryType.CREDIT] - totals[EntryType.DEBIT] + totals['subaccounts']
+

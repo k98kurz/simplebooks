@@ -9,11 +9,16 @@ from time import time
 import packify
 
 
+_empty_dict = packify.pack({})
+
+
 class Statement(SqlModel):
     connection_info: str = ''
     table: str = 'statements'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'height', 'tx_ids', 'ledger_id', 'balances', 'timestamp', 'details')
+    columns: tuple[str] = (
+        'id', 'height', 'tx_ids', 'ledger_id', 'balances', 'timestamp', 'details'
+    )
     id: str
     height: int
     tx_ids: str
@@ -40,7 +45,7 @@ class Statement(SqlModel):
     @property
     def balances(self) -> dict[str, tuple[EntryType, int]]:
         """A dict mapping account IDs to tuple[EntryType, int] balances."""
-        balances: dict = packify.unpack(self.data.get('balances', b'd\x00\x00\x00\x00'))
+        balances: dict = packify.unpack(self.data.get('balances', _empty_dict))
         return {
             k: (EntryType(v[0]), v[1])
             for k, v in balances.items()
@@ -93,7 +98,10 @@ class Statement(SqlModel):
         return balances
 
     @classmethod
-    def prepare(cls, txns: list[Transaction|ArchivedTransaction], ledger: Ledger|None = None) -> Statement:
+    def prepare(
+            cls, txns: list[Transaction|ArchivedTransaction],
+            ledger: Ledger|None = None
+        ) -> Statement:
         """Prepare a statement by checking that all txns are for the
             same ledger and summarizing the net account balance changes
             from the transactions and the previous Statement. Raises
@@ -102,9 +110,14 @@ class Statement(SqlModel):
             instances. Raises ValueError if the transactions are not all
             for the same ledger.
         """
-        tert(len(txns) > 0 or ledger is not None, 'must provide either txns or ledger')
-        tert(all([isinstance(txn, (Transaction, ArchivedTransaction)) for txn in txns]),
-             'all txns must be Transaction or ArchivedTransaction instances')
+        tert(len(txns) > 0 or ledger is not None,
+            'must provide either txns or ledger')
+        tert(all([
+                isinstance(txn, (Transaction, ArchivedTransaction))
+                for txn in txns
+            ]),
+             'all txns must be Transaction or ArchivedTransaction instances'
+        )
         if ledger is None:
             ledger = txns[0].ledger
         vert(all([ledger.id == txn.ledger_ids for txn in txns]),
@@ -187,5 +200,5 @@ class Statement(SqlModel):
             if archive:
                 txn.archive()
             txn.delete()
-        self.delete()
         return len(txns)
+

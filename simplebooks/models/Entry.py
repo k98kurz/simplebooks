@@ -83,3 +83,4 @@ class Entry(SqlModel):
             return ArchivedEntry.insert({**self.data})
         except Exception as e:
             return ArchivedEntry.find(self.id)
+

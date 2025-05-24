@@ -9,6 +9,9 @@ from .EntryType import EntryType
 import packify
 
 
+_None = packify.pack(None)
+
+
 class Account(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'accounts'
@@ -31,6 +34,7 @@ class Account(AsyncSqlModel):
     category: AsyncRelatedModel
     children: AsyncRelatedCollection
     entries: AsyncRelatedCollection
+    archived_entries: AsyncRelatedCollection
 
     # override automatic property
     @property
@@ -46,7 +50,7 @@ class Account(AsyncSqlModel):
     @property
     def details(self) -> packify.SerializableType:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', None) or b'n\x00\x00\x00\x00')
+        return packify.unpack(self.data.get('details', None) or _None)
     @details.setter
     def details(self, val: packify.SerializableType):
         if isinstance(val, packify.SerializableType):
@@ -69,24 +73,33 @@ class Account(AsyncSqlModel):
         return result
 
     @classmethod
-    async def insert_many(cls, items: list[dict], /, *, suppress_events: bool = False) -> int:
+    async def insert_many(
+            cls, items: list[dict], /, *, suppress_events: bool = False
+        ) -> int:
         """Ensure items are encoded before inserting."""
         items = [cls._encode(item) for item in items]
         return await super().insert_many(items, suppress_events=suppress_events)
 
-    async def update(self, updates: dict, /, *, suppress_events: bool = False) -> Account:
+    async def update(
+            self, updates: dict, /, *, suppress_events: bool = False
+        ) -> Account:
         """Ensure updates are encoded before updating."""
         updates = self._encode(updates)
         return await super().update(updates, suppress_events=suppress_events)
 
     @classmethod
-    def query(cls, conditions: dict = None, connection_info: str = None) -> AsyncQueryBuilderProtocol:
+    def query(
+            cls, conditions: dict = None, connection_info: str = None
+        ) -> AsyncQueryBuilderProtocol:
         """Ensure conditions are encoded before querying."""
         if conditions and type(conditions.get('type', None)) is AccountType:
             conditions['type'] = conditions['type'].value
         return super().query(conditions, connection_info)
 
-    async def balance(self, include_sub_accounts: bool = True) -> int:
+    async def balance(
+            self, include_sub_accounts: bool = True,
+            previous_balances: dict[str, tuple[EntryType, int]] = {}
+        ) -> int:
         """Tally all entries for this account. Includes the balances of
             all sub-accounts if include_sub_accounts is True.
         """
@@ -95,6 +108,12 @@ class Account(AsyncSqlModel):
             EntryType.DEBIT: 0,
             'subaccounts': 0,
         }
+        if self.id in previous_balances:
+            if previous_balances[self.id][0] == EntryType.CREDIT:
+                totals[EntryType.CREDIT] = previous_balances[self.id][1]
+            else:
+                totals[EntryType.DEBIT] = previous_balances[self.id][1]
+
         async for entries in self.entries().query().chunk(500):
             entry: Entry
             for entry in entries:
@@ -103,7 +122,10 @@ class Account(AsyncSqlModel):
         if include_sub_accounts:
             for acct in self.children:
                 acct: Account
-                totals['subaccounts'] += await acct.balance(include_sub_accounts=True)
+                totals['subaccounts'] += await acct.balance(
+                    include_sub_accounts=True,
+                    previous_balances=previous_balances,
+                )
 
         if self.type in (
             AccountType.ASSET, AccountType.DEBIT_BALANCE,
@@ -112,3 +134,4 @@ class Account(AsyncSqlModel):
             return totals[EntryType.DEBIT] - totals[EntryType.CREDIT] + totals['subaccounts']
 
         return totals[EntryType.CREDIT] - totals[EntryType.DEBIT] + totals['subaccounts']
+
