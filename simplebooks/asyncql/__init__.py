@@ -22,6 +22,7 @@ Identity.ledgers = async_has_many(Identity, Ledger, 'identity_id')
 Ledger.owner = async_belongs_to(Ledger, Identity, 'identity_id')
 
 Ledger.currency = async_belongs_to(Ledger, Currency, 'currency_id')
+Currency.ledgers = async_has_many(Currency, Ledger, 'currency_id')
 
 Ledger.accounts = async_has_many(Ledger, Account, 'ledger_id')
 Account.ledger = async_belongs_to(Account, Ledger, 'ledger_id')

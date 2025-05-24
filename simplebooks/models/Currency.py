@@ -1,5 +1,5 @@
 from decimal import Decimal
-from sqloquent import SqlModel
+from sqloquent import SqlModel, RelatedCollection
 
 
 class Currency(SqlModel):
@@ -18,6 +18,7 @@ class Currency(SqlModel):
     unit_divisions: int
     base: int|None
     details: str|None
+    ledgers: RelatedCollection
 
     def to_decimal(self, amount: int) -> Decimal:
         """Convert the amount into a Decimal representation."""

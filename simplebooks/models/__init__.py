@@ -22,6 +22,7 @@ Identity.ledgers = has_many(Identity, Ledger, 'identity_id')
 Ledger.owner = belongs_to(Ledger, Identity, 'identity_id')
 
 Ledger.currency = belongs_to(Ledger, Currency, 'currency_id')
+Currency.ledgers = has_many(Currency, Ledger, 'currency_id')
 
 Ledger.accounts = has_many(Ledger, Account, 'ledger_id')
 Account.ledger = belongs_to(Account, Ledger, 'ledger_id')

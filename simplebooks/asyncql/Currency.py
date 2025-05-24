@@ -1,5 +1,5 @@
 from decimal import Decimal
-from sqloquent.asyncql import AsyncSqlModel
+from sqloquent.asyncql import AsyncSqlModel, AsyncRelatedCollection
 
 
 class Currency(AsyncSqlModel):
@@ -18,6 +18,7 @@ class Currency(AsyncSqlModel):
     unit_divisions: int
     base: int|None
     details: str|None
+    ledgers: AsyncRelatedCollection
 
     def to_decimal(self, amount: int) -> Decimal:
         """Convert the amount into a Decimal representation."""
