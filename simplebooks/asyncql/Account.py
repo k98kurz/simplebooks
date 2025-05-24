@@ -101,7 +101,12 @@ class Account(AsyncSqlModel):
             previous_balances: dict[str, tuple[EntryType, int]] = {}
         ) -> int:
         """Tally all entries for this account. Includes the balances of
-            all sub-accounts if include_sub_accounts is True.
+            all sub-accounts if include_sub_accounts is True. If
+            `previous_balances` is supplied mapping `Account.id` to
+            `tuple[EntryType,int]`, and if `self.id` is in it, the
+            second value of the tuple will be included in the balance
+            calculation (and the balance calculations of subaccounts if
+            `include_sub_accounts=True`).
         """
         totals = {
             EntryType.CREDIT: 0,

@@ -68,7 +68,10 @@ Ensure conditions are encoded before querying.
 ##### `balance(include_sub_accounts: bool = True, previous_balances: dict[str, tuple[EntryType, int]] = {}) -> int:`
 
 Tally all entries for this account. Includes the balances of all sub-accounts if
-include_sub_accounts is True.
+`include_sub_accounts` is True. If `previous_balances` is supplied mapping
+`Account.id` to `tuple[EntryType,int]`, and if `self.id` is in it, the second
+value of the tuple will be included in the balance calculation (and the balance
+calculations of subaccounts if `include_sub_accounts=True`).
 
 ### `AccountCategory(SqlModel)`
 
@@ -90,7 +93,7 @@ include_sub_accounts is True.
 
 #### Properties
 
-- ledger_type: The LedgerType that this AccountCategory applies to, if any.
+- ledger_type: The `LedgerType` that this `AccountCategory` applies to, if any.
 - accounts: The related Accounts. Setting raises TypeError if the precondition
 check fails.
 
