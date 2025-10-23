@@ -1,3 +1,10 @@
+## 0.3.1
+
+- Updated `Currency`:
+    - Added `from_decimal` method
+    - Updated `format` method to include non-decimal formatting,
+      e.g. 'H00:00:00'
+
 ## 0.3.0
 
 - Added `Statement`, `ArchivedTransaction`, and `ArchivedEntry`

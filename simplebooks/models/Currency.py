@@ -25,6 +25,11 @@ class Currency(SqlModel):
         base = self.base or 10
         return Decimal(amount) / Decimal(base**self.unit_divisions)
 
+    def from_decimal(self, amount: Decimal) -> int:
+        """Convert the amount from a Decimal representation."""
+        base = self.base or 10
+        return int(amount * base**self.unit_divisions)
+
     def get_units(self, amount: int) -> tuple[int,]:
         """Get the full units and subunits. The number of subunit
             figures will be equal to `unit_divisions`; e.g. if `base=10`
@@ -44,20 +49,33 @@ class Currency(SqlModel):
         unit_divisions = self.unit_divisions
         return get_subunits(amount, base, unit_divisions)
 
-    def format(self, amount: int, *, decimal_places: int = 2,
-               use_prefix: bool = True, use_postfix: bool = False,
-               use_fx_symbol: bool = False) -> str:
+    def format(
+            self, amount: int, *,
+            use_decimal: bool = True, decimal_places: int = 2,
+            use_prefix: bool = True, use_postfix: bool = False,
+            use_fx_symbol: bool = False, divider: str = '.'
+        ) -> str:
         """Format an amount using the correct number of `decimal_places`."""
-        amount: str = str(self.to_decimal(amount))
-        if '.' not in amount:
-            amount += '.'
-        digits = amount.split('.')[1]
-
-        while len(digits) < decimal_places:
-            digits += '0'
-
-        digits = digits[:decimal_places]
-        amount = f"{amount.split('.')[0]}.{digits}"
+        if use_decimal:
+            amount: str = str(self.to_decimal(amount))
+            if '.' not in amount:
+                amount += '.'
+            digits = amount.split('.')[1]
+    
+            while len(digits) < decimal_places:
+                digits += '0'
+    
+            digits = digits[:decimal_places]
+            amount = f"{amount.split('.')[0]}.{digits}"
+        else:
+            units = self.get_units(amount)
+            amount = ''
+            for u in units:
+                p = str(u)
+                while len(p) < decimal_places:
+                    p = "0" + p
+                amount = f"{amount}:{p}"
+            amount = amount[1:]
 
         if self.postfix_symbol and use_postfix:
             return f"{amount}{self.postfix_symbol}"
