@@ -244,6 +244,10 @@ check fails.
 
 Convert the amount into a Decimal representation.
 
+##### `from_decimal(amount: Decimal) -> int:`
+
+Convert the amount from a Decimal representation.
+
 ##### `get_units(amount: int) -> tuple[int]:`
 
 Get the full units and subunits. The number of subunit figures will be equal to
@@ -251,9 +255,13 @@ Get the full units and subunits. The number of subunit figures will be equal to
 will return `(2, 0, 0)`; if `base=60` and `unit_divisions=2`, `get_units(200)`
 will return `(0, 3, 20)`.
 
-##### `format(amount: int, /, *, use_fx_symbol: bool = False, use_postfix: bool = False, use_prefix: bool = True, decimal_places: int = 2) -> str:`
+##### `format(amount: int, /, *, divider: str = '.', use_fx_symbol: bool = False, use_postfix: bool = False, use_prefix: bool = True, decimal_places: int = 2, use_decimal: bool = True) -> str:`
 
-Format an amount using the correct number of `decimal_places`.
+Format an amount using the correct number of `decimal_places`. If `use_decimal`
+is `False`, instead the unit subdivisions from `get_units` will be combined
+using the `divider` char, and each part will be prefix padded with 0s to reach
+the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
+'02:00'` for a Currency with `base=100` and `unit_divisions=1`.
 
 ### `Customer(SqlModel)`
 
