@@ -55,7 +55,14 @@ class Currency(SqlModel):
             use_prefix: bool = True, use_postfix: bool = False,
             use_fx_symbol: bool = False, divider: str = '.'
         ) -> str:
-        """Format an amount using the correct number of `decimal_places`."""
+        """Format an amount using the correct number of `decimal_places`.
+            If `use_decimal` is `False`, instead the unit subdivisions
+            from `get_units` will be combined using the `divider`
+            char, and each part will be prefix padded with 0s to reach
+            the `decimal_places`. E.g. `.format(200, use_decimal=False,
+            divider=':') == '02:00'` for a Currency with `base=100` and
+            `unit_divisions=1`.
+        """
         if use_decimal:
             amount: str = str(self.to_decimal(amount))
             if '.' not in amount:
