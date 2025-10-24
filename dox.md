@@ -545,10 +545,10 @@ precondition check fails.
 ##### `@classmethod prepare(entries: list[Entry], timestamp: str, details: packify.SerializableType = None, reload: bool = False) -> Transaction:`
 
 Prepare a transaction. Raises TypeError for invalid arguments. Raises ValueError
-if the entries do not balance for each ledger; if a required auth script is
-missing; or if any of the entries is contained within an existing Transaction.
-Entries and Transaction will have IDs generated but will not be persisted to the
-database and must be saved separately.
+if the entries do not balance for each ledger; or if any of the entries is
+contained within an existing Transaction. Entries and Transaction will have IDs
+generated but will not be persisted to the database and must be saved
+separately.
 
 ##### `validate(reload: bool = False) -> bool:`
 
