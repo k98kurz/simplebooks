@@ -1,3 +1,8 @@
+## 0.3.2
+
+- Updated packify dependency to 0.3.1 and applied compatibility patches
+- Small changes to documentation
+
 ## 0.3.1
 
 - Updated `Currency`:
