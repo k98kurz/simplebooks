@@ -146,6 +146,10 @@ class TestStatementsE2E(unittest.TestCase):
             txn: asyncql.ArchivedTransaction
             assert await txn.validate()
 
+        # test empty archived transaction and entry
+        (asyncql.ArchivedTransaction()).details
+        (asyncql.ArchivedEntry()).details
+
     def test_e2e(self):
         run(self.e2e())
 

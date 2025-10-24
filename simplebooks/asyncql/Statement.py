@@ -9,6 +9,9 @@ from time import time
 import packify
 
 
+_empty_dict = packify.pack({})
+
+
 class Statement(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'statements'
@@ -40,7 +43,7 @@ class Statement(AsyncSqlModel):
     @property
     def balances(self) -> dict[str, tuple[EntryType, int]]:
         """A dict mapping account IDs to tuple[EntryType, int] balances."""
-        balances: dict = packify.unpack(self.data.get('balances', b'd\x00\x00\x00\x00'))
+        balances: dict = packify.unpack(self.data.get('balances', _empty_dict))
         return {
             k: (EntryType(v[0]), v[1])
             for k, v in balances.items()

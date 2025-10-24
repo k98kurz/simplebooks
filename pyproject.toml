@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "simplebooks"
-version = "0.3.1"
+version = "0.3.2"
 authors = [
   { name="k98kurz", email="k98kurz@gmail.com" },
 ]
@@ -22,7 +22,7 @@ classifiers = [
 ]
 dependencies = [
   "sqloquent >= 0.7.0",
-  "packify >= 0.2.3"
+  "packify >= 0.3.1"
 ]
 
 [project.urls]

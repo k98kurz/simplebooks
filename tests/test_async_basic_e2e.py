@@ -121,6 +121,10 @@ class TestAsyncBasicE2E(unittest.TestCase):
         customer.details = {'number': 1234}
         run(customer.save())
 
+        # test empty transaction and entry
+        (asyncql.Transaction()).details
+        (asyncql.Entry()).details
+
         # prepare and save a valid transaction
         txn_nonce = os.urandom(16)
         equity_entry = asyncql.Entry({

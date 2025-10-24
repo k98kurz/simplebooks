@@ -7,6 +7,9 @@ from .EntryType import EntryType
 import packify
 
 
+_None = packify.pack(None)
+
+
 class Entry(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'entries'
@@ -39,7 +42,7 @@ class Entry(AsyncSqlModel):
     @property
     def details(self) -> packify.SerializableType:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', b'n\x00\x00\x00\x00'))
+        return packify.unpack(self.data.get('details', _None))
     @details.setter
     def details(self, val: packify.SerializableType):
         self.data['details'] = packify.pack(val)

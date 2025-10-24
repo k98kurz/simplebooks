@@ -145,6 +145,10 @@ class TestStatementsE2E(unittest.TestCase):
             txn: models.ArchivedTransaction
             assert txn.validate()
 
+        # test empty archived transaction and entry
+        (models.ArchivedTransaction()).details
+        (models.ArchivedEntry()).details
+
 
 if __name__ == '__main__':
     unittest.main()

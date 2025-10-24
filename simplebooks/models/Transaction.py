@@ -6,6 +6,9 @@ from .Entry import Entry, EntryType
 import packify
 
 
+_empty_dict = packify.pack({})
+
+
 class Transaction(SqlModel):
     connection_info: str = ''
     table: str = 'transactions'
@@ -24,7 +27,7 @@ class Transaction(SqlModel):
     @property
     def details(self) -> dict[str, bytes]:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', b'd\x00\x00\x00\x00'))
+        return packify.unpack(self.data.get('details', _empty_dict))
     @details.setter
     def details(self, val: dict[str, bytes]):
         if type(val) is not dict:
