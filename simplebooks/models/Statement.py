@@ -17,7 +17,8 @@ class Statement(SqlModel):
     table: str = 'statements'
     id_column: str = 'id'
     columns: tuple[str] = (
-        'id', 'height', 'tx_ids', 'ledger_id', 'balances', 'timestamp', 'details'
+        'id', 'height', 'tx_ids', 'ledger_id', 'balances', 'timestamp',
+        'details', 'description',
     )
     id: str
     height: int
@@ -26,6 +27,7 @@ class Statement(SqlModel):
     balances: bytes
     timestamp: str
     details: bytes
+    description: str|None
     ledger: RelatedModel
     transactions: RelatedCollection
     archived_transactions: RelatedCollection
@@ -201,4 +203,3 @@ class Statement(SqlModel):
                 txn.archive()
             txn.delete()
         return len(txns)
-

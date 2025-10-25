@@ -8,7 +8,7 @@ class Currency(SqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'name', 'prefix_symbol', 'postfix_symbol',
-        'fx_symbol', 'unit_divisions', 'base', 'details'
+        'fx_symbol', 'unit_divisions', 'base', 'details', 'description',
     )
     id: str
     name: str
@@ -18,6 +18,7 @@ class Currency(SqlModel):
     unit_divisions: int
     base: int|None
     details: str|None
+    description: str|None
     ledgers: RelatedCollection
 
     def to_decimal(self, amount: int) -> Decimal:
@@ -33,7 +34,7 @@ class Currency(SqlModel):
     def get_units(self, amount: int) -> tuple[int,]:
         """Get the full units and subunits. The number of subunit
             figures will be equal to `unit_divisions`; e.g. if `base=10`
-            and `unit_divisions=2`, `get_units(200)` will return 
+            and `unit_divisions=2`, `get_units(200)` will return
             `(2, 0, 0)`; if `base=60` and `unit_divisions=2`,
             `get_units(200)` will return `(0, 3, 20)`.
         """
@@ -68,10 +69,10 @@ class Currency(SqlModel):
             if '.' not in amount:
                 amount += '.'
             digits = amount.split('.')[1]
-    
+
             while len(digits) < decimal_places:
                 digits += '0'
-    
+
             digits = digits[:decimal_places]
             amount = f"{amount.split('.')[0]}.{digits}"
         else:
@@ -94,4 +95,3 @@ class Currency(SqlModel):
             return f"{self.prefix_symbol}{amount}"
 
         return amount
-

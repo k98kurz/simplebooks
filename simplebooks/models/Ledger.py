@@ -8,12 +8,15 @@ class Ledger(SqlModel):
     connection_info: str = ''
     table: str = 'ledgers'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'name', 'type', 'identity_id', 'currency_id')
+    columns: tuple[str] = (
+        'id', 'name', 'type', 'identity_id', 'currency_id', 'description',
+    )
     id: str
     name: str
     type: str
     identity_id: str
     currency_id: str
+    description: str|None
     owner: RelatedModel
     currency: RelatedModel
     accounts: RelatedCollection
@@ -29,18 +32,6 @@ class Ledger(SqlModel):
     def type(self, val: LedgerType):
         if type(val) is LedgerType:
             self.data['type'] = val.value
-
-    def balances(self, reload: bool = False) -> dict[str, tuple[int, AccountType]]:
-        """Return a dict mapping account ids to their balances. Accounts
-            with sub-accounts will not include the sub-account balances;
-            the sub-account balances will be returned separately.
-        """
-        balances = {}
-        if reload:
-            self.accounts().reload()
-        for account in self.accounts:
-            balances[account.id] = (account.balance(False), account.type)
-        return balances
 
     @classmethod
     def _encode(cls, data: dict) -> dict:
@@ -71,6 +62,19 @@ class Ledger(SqlModel):
     def query(cls, conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:
         """Ensure conditions are encoded before querying."""
         return super().query(cls._encode(conditions), connection_info)
+
+    def balances(self, reload: bool = False) -> dict[str, tuple[int, AccountType]]:
+        """Return a dict mapping account ids to their balances. Accounts
+            with sub-accounts will not include the sub-account balances;
+            the sub-account balances will be returned separately.
+        """
+        balances = {}
+        if reload:
+            self.accounts().reload()
+        for account in self.accounts:
+            account: Account
+            balances[account.id] = (account.balance(False), account.type)
+        return balances
 
     def setup_basic_accounts(self) -> list[Account]:
         """Creates and returns a list of 3 unsaved Accounts covering the

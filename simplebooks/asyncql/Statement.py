@@ -16,7 +16,10 @@ class Statement(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'statements'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'height', 'tx_ids', 'ledger_id', 'balances', 'timestamp', 'details')
+    columns: tuple[str] = (
+        'id', 'height', 'tx_ids', 'ledger_id', 'balances', 'timestamp',
+        'details', 'description',
+    )
     id: str
     height: int
     tx_ids: str
@@ -24,6 +27,7 @@ class Statement(AsyncSqlModel):
     balances: bytes
     timestamp: str
     details: bytes
+    description: str|None
     ledger: AsyncRelatedModel
     transactions: AsyncRelatedCollection
     archived_transactions: AsyncRelatedCollection
@@ -199,4 +203,3 @@ class Statement(AsyncSqlModel):
                 await txn.archive()
             await txn.delete()
         return len(txns)
-

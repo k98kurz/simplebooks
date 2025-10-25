@@ -11,16 +11,21 @@ class Ledger(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'ledgers'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'name', 'type', 'identity_id', 'currency_id')
+    columns: tuple[str] = (
+        'id', 'name', 'type', 'identity_id', 'currency_id', 'description',
+    )
     id: str
     name: str
     type: str
     identity_id: str
     currency_id: str
+    description: str|None
     owner: AsyncRelatedModel
     currency: AsyncRelatedModel
     accounts: AsyncRelatedCollection
     transactions: AsyncRelatedCollection
+    archived_transactions: AsyncRelatedCollection
+    statements: AsyncRelatedCollection
 
     @property
     def type(self) -> LedgerType:
@@ -70,6 +75,7 @@ class Ledger(AsyncSqlModel):
         if reload:
             await self.accounts().reload()
         for account in self.accounts:
+            account: Account
             balances[account.id] = (await account.balance(False), account.type)
         return balances
 
