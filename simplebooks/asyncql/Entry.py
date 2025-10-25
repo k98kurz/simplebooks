@@ -14,13 +14,16 @@ class Entry(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'entries'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'type', 'amount', 'nonce', 'account_id', 'details')
+    columns: tuple[str] = (
+        'id', 'type', 'amount', 'nonce', 'account_id', 'details', 'description',
+    )
     id: str
     type: str
     amount: int
     nonce: bytes
     account_id: str
     details: bytes
+    description: str|None
     account: AsyncRelatedModel
     transactions: AsyncRelatedCollection
 
@@ -97,4 +100,3 @@ class Entry(AsyncSqlModel):
             return await ArchivedEntry.insert({**self.data})
         except Exception as e:
             return await ArchivedEntry.find(self.id)
-

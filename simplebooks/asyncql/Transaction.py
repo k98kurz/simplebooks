@@ -13,12 +13,15 @@ class Transaction(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'transactions'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'entry_ids', 'ledger_ids', 'timestamp', 'details')
+    columns: tuple[str] = (
+        'id', 'entry_ids', 'ledger_ids', 'timestamp', 'details', 'description',
+    )
     id: str
     entry_ids: str
     ledger_ids: str
     timestamp: str
     details: bytes
+    description: str|None
     entries: AsyncRelatedCollection
     ledgers: AsyncRelatedCollection
 
@@ -128,4 +131,3 @@ class Transaction(AsyncSqlModel):
             return await ArchivedTransaction.insert({**self.data})
         except Exception as e:
             return await ArchivedTransaction.find(self.id)
-

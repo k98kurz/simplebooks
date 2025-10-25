@@ -12,13 +12,16 @@ class Entry(SqlModel):
     connection_info: str = ''
     table: str = 'entries'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'type', 'amount', 'nonce', 'account_id', 'details')
+    columns: tuple[str] = (
+        'id', 'type', 'amount', 'nonce', 'account_id', 'details', 'description',
+    )
     id: str
     type: str
     amount: int
     nonce: bytes
     account_id: str
     details: bytes
+    description: str|None
     account: RelatedModel
     transactions: RelatedCollection
 
@@ -86,4 +89,3 @@ class Entry(SqlModel):
             return ArchivedEntry.insert({**self.data})
         except Exception as e:
             return ArchivedEntry.find(self.id)
-

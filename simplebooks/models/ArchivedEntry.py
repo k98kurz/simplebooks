@@ -11,13 +11,16 @@ class ArchivedEntry(SqlModel):
     connection_info: str = ''
     table: str = 'archived_entries'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'type', 'amount', 'nonce', 'account_id', 'details')
+    columns: tuple[str] = (
+        'id', 'type', 'amount', 'nonce', 'account_id', 'details', 'description',
+    )
     id: str
     type: str
     amount: int
     nonce: bytes
     account_id: str
     details: bytes
+    description: str|None
     account: RelatedModel
     transactions: RelatedCollection
 

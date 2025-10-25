@@ -18,7 +18,7 @@ class Account(SqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'name', 'type', 'ledger_id', 'parent_id', 'code',
-        'category_id', 'details', 'active'
+        'category_id', 'details', 'active', 'description'
     )
     id: str
     name: str
@@ -29,6 +29,7 @@ class Account(SqlModel):
     category_id: str|None
     details: bytes|None
     active: bool|Default[True]
+    description: str|None
     ledger: RelatedModel
     parent: RelatedModel
     category: RelatedModel
@@ -139,4 +140,3 @@ class Account(SqlModel):
             return totals[EntryType.DEBIT] - totals[EntryType.CREDIT] + totals['subaccounts']
 
         return totals[EntryType.CREDIT] - totals[EntryType.DEBIT] + totals['subaccounts']
-

@@ -13,12 +13,15 @@ class Transaction(SqlModel):
     connection_info: str = ''
     table: str = 'transactions'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'entry_ids', 'ledger_ids', 'timestamp', 'details')
+    columns: tuple[str] = (
+        'id', 'entry_ids', 'ledger_ids', 'timestamp', 'details', 'description',
+    )
     id: str
     entry_ids: str
     ledger_ids: str
     timestamp: str
     details: bytes
+    description: str|None
     entries: RelatedCollection
     ledgers: RelatedCollection
     statements: RelatedCollection
@@ -129,4 +132,3 @@ class Transaction(SqlModel):
             return ArchivedTransaction.insert({**self.data})
         except Exception as e:
             return ArchivedTransaction.find(self.id)
-

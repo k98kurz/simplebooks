@@ -12,12 +12,15 @@ class ArchivedTransaction(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'archived_transactions'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'entry_ids', 'ledger_ids', 'timestamp', 'details')
+    columns: tuple[str] = (
+        'id', 'entry_ids', 'ledger_ids', 'timestamp', 'details', 'description',
+    )
     id: str
     entry_ids: str
     ledger_ids: str
     timestamp: str
     details: bytes
+    description: str|None
     entries: AsyncRelatedCollection
     ledgers: AsyncRelatedCollection
     statements: AsyncRelatedCollection
@@ -81,4 +84,3 @@ class ArchivedTransaction(AsyncSqlModel):
         for e in self.entries:
             await e.save()
         return await super().save()
-

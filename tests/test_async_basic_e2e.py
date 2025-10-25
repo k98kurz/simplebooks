@@ -115,10 +115,12 @@ class TestAsyncBasicE2E(unittest.TestCase):
 
         # make a vendor and a customer
         vendor = asyncql.Vendor({'name': 'Vendor-san', 'code': '1530'})
-        vendor.details = {'some': 'thing'}
+        vendor.details = 'some details'
+        vendor.description = 'a vendor'
         run(vendor.save())
         customer = asyncql.Customer({'name': 'Customer-sama', 'code': '2300'})
-        customer.details = {'number': 1234}
+        customer.details = '1234'
+        customer.description = 'a customer'
         run(customer.save())
 
         # test empty transaction and entry

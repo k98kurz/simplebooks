@@ -1,26 +1,25 @@
 from sqloquent.asyncql import AsyncSqlModel
-import packify
-
-
-_empty_dict = packify.pack({})
 
 
 class Vendor(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'vendors'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'name', 'code', 'details')
+    columns: tuple[str] = ('id', 'name', 'code', 'details', 'description')
     id: str
     name: str
     code: str|None
     details: str|None
+    description: str|None
 
     # override automatic property
     @property
-    def details(self) -> packify.SerializableType:
-        """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', None) or _empty_dict)
+    def details(self) -> str|None:
+        """A string stored in the database as text. Note that this will
+            be changed to a packify.SerializableType stored as a blob in
+            0.4.0.
+        """
+        return self.data.get('details', None)
     @details.setter
-    def details(self, val: packify.SerializableType):
-        if isinstance(val, packify.SerializableType):
-            self.data['details'] = packify.pack(val)
+    def details(self, val: str|None):
+        self.data['details'] = val

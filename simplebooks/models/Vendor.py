@@ -1,15 +1,11 @@
 from sqloquent import SqlModel
-import packify
-
-
-_None = packify.pack(None)
 
 
 class Vendor(SqlModel):
     connection_info: str = ''
     table: str = 'vendors'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'name', 'code', 'details')
+    columns: tuple[str] = ('id', 'name', 'code', 'details', 'description')
     id: str
     name: str
     code: str|None
@@ -17,10 +13,12 @@ class Vendor(SqlModel):
 
     # override automatic property
     @property
-    def details(self) -> packify.SerializableType:
-        """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', None) or _None)
+    def details(self) -> str|None:
+        """A string stored in the database as text. Note that this will
+            be changed to a packify.SerializableType stored as a blob in
+            0.4.0.
+        """
+        return self.data.get('details', None)
     @details.setter
-    def details(self, val: packify.SerializableType):
-        if isinstance(val, packify.SerializableType):
-            self.data['details'] = packify.pack(val)
+    def details(self, val: str|None):
+        self.data['details'] = val

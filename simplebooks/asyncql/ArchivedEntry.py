@@ -13,13 +13,16 @@ class ArchivedEntry(AsyncSqlModel):
     connection_info: str = ''
     table: str = 'archived_entries'
     id_column: str = 'id'
-    columns: tuple[str] = ('id', 'type', 'amount', 'nonce', 'account_id', 'details')
+    columns: tuple[str] = (
+        'id', 'type', 'amount', 'nonce', 'account_id', 'details', 'description',
+    )
     id: str
     type: str
     amount: int
     nonce: bytes
     account_id: str
     details: bytes
+    description: str|None
     account: AsyncRelatedModel
     transactions: AsyncRelatedCollection
 
@@ -78,4 +81,3 @@ class ArchivedEntry(AsyncSqlModel):
     def query(cls, conditions: dict = None) -> AsyncQueryBuilderProtocol:
         """Ensure conditions are encoded properly before querying."""
         return super().query(cls._encode(conditions))
-
