@@ -23,6 +23,7 @@
 - category_id: str | None
 - details: bytes | None
 - active: bool | Default[True]
+- description: str | None
 - ledger: RelatedModel
 - parent: RelatedModel
 - category: RelatedModel
@@ -139,6 +140,7 @@ LIABILITY, EQUITY, CONTRA_LIABILITY, CONTRA_EQUITY.
 - nonce: bytes
 - account_id: str
 - details: bytes
+- description: str | None
 - account: RelatedModel
 - transactions: RelatedCollection
 
@@ -152,6 +154,8 @@ the precondition check fails.
 check fails.
 
 #### Methods
+
+##### `__hash__() -> int:`
 
 ##### `@classmethod insert(data: dict) -> ArchivedEntry | None:`
 
@@ -183,6 +187,7 @@ Ensure conditions are encoded properly before querying.
 - ledger_ids: str
 - timestamp: str
 - details: bytes
+- description: str | None
 - entries: RelatedCollection
 - ledgers: RelatedCollection
 - statements: RelatedCollection
@@ -231,6 +236,7 @@ Validate the transaction, save the entries, then save the transaction.
 - unit_divisions: <class 'int'>
 - base: int | None
 - details: str | None
+- description: str | None
 - ledgers: <class 'sqloquent.interfaces.RelatedCollection'>
 
 #### Properties
@@ -279,10 +285,12 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
 - details: str | None
+- description: str | None
 
 #### Properties
 
-- details: A packify.SerializableType stored in the database as a blob.
+- details: A string stored in the database as text. Note that this will be
+changed to a packify.SerializableType stored as a blob in 0.4.0.
 
 ### `Entry(SqlModel)`
 
@@ -303,6 +311,7 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 - nonce: bytes
 - account_id: str
 - details: bytes
+- description: str | None
 - account: RelatedModel
 - transactions: RelatedCollection
 
@@ -316,6 +325,8 @@ check fails.
 precondition check fails.
 
 #### Methods
+
+##### `__hash__() -> int:`
 
 ##### `@classmethod insert(data: dict) -> Entry | None:`
 
@@ -352,11 +363,11 @@ Enum of valid Entry types: CREDIT and DEBIT.
 - data: dict
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
-- columns_excluded_from_hash: tuple[str]
 - details: bytes
 - pubkey: bytes | None
 - seed: bytes | None
 - secret_details: bytes | None
+- description: str | None
 - ledgers: RelatedCollection
 
 #### Properties
@@ -387,6 +398,7 @@ Return the public data for cloning the Identity.
 - type: str
 - identity_id: str
 - currency_id: str
+- description: str | None
 - owner: RelatedModel
 - currency: RelatedModel
 - accounts: RelatedCollection
@@ -412,12 +424,6 @@ TypeError if the precondition check fails.
 
 #### Methods
 
-##### `balances(reload: bool = False) -> dict[str, tuple[int, AccountType]]:`
-
-Return a dict mapping account ids to their balances. Accounts with sub-accounts
-will not include the sub-account balances; the sub-account balances will be
-returned separately.
-
 ##### `@classmethod insert(data: dict) -> Ledger | None:`
 
 Ensure data is encoded before inserting.
@@ -433,6 +439,12 @@ Ensure updates are encoded before updating.
 ##### `@classmethod query(conditions: dict = None, connection_info: str = None) -> QueryBuilderProtocol:`
 
 Ensure conditions are encoded before querying.
+
+##### `balances(reload: bool = False) -> dict[str, tuple[int, AccountType]]:`
+
+Return a dict mapping account ids to their balances. Accounts with sub-accounts
+will not include the sub-account balances; the sub-account balances will be
+returned separately.
 
 ##### `setup_basic_accounts() -> list[Account]:`
 
@@ -464,6 +476,7 @@ respectively.
 - balances: bytes
 - timestamp: str
 - details: bytes
+- description: str | None
 - ledger: RelatedModel
 - transactions: RelatedCollection
 - archived_transactions: RelatedCollection
@@ -526,6 +539,7 @@ valid.
 - ledger_ids: str
 - timestamp: str
 - details: bytes
+- description: str | None
 - entries: RelatedCollection
 - ledgers: RelatedCollection
 - statements: RelatedCollection
@@ -586,7 +600,8 @@ ArchivedTransaction.
 
 #### Properties
 
-- details: A packify.SerializableType stored in the database as a blob.
+- details: A string stored in the database as text. Note that this will be
+changed to a packify.SerializableType stored as a blob in 0.4.0.
 
 ## Functions
 

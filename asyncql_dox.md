@@ -30,6 +30,7 @@ Enum of valid Entry types: CREDIT and DEBIT.
 - nonce: bytes
 - account_id: str
 - details: bytes
+- description: str | None
 - account: AsyncRelatedModel
 - transactions: AsyncRelatedCollection
 
@@ -43,6 +44,8 @@ the precondition check fails.
 check fails.
 
 #### Methods
+
+##### `__hash__() -> int:`
 
 ##### `@classmethod async insert(data: dict) -> ArchivedEntry | None:`
 
@@ -75,6 +78,7 @@ Ensure conditions are encoded properly before querying.
 - nonce: bytes
 - account_id: str
 - details: bytes
+- description: str | None
 - account: AsyncRelatedModel
 - transactions: AsyncRelatedCollection
 
@@ -88,6 +92,8 @@ check fails.
 precondition check fails.
 
 #### Methods
+
+##### `__hash__() -> int:`
 
 ##### `@staticmethod parse(models: Entry | list[Entry]) -> Entry | list[Entry]:`
 
@@ -129,6 +135,7 @@ ArchivedEntry.
 - category_id: str | None
 - details: bytes | None
 - active: bool | Default[True]
+- description: str | None
 - ledger: AsyncRelatedModel
 - parent: AsyncRelatedModel
 - category: AsyncRelatedModel
@@ -244,6 +251,7 @@ Ensure conditions are encoded before querying.
 - ledger_ids: str
 - timestamp: str
 - details: bytes
+- description: str | None
 - entries: AsyncRelatedCollection
 - ledgers: AsyncRelatedCollection
 - statements: AsyncRelatedCollection
@@ -292,6 +300,7 @@ Validate the transaction, save the entries, then save the transaction.
 - unit_divisions: <class 'int'>
 - base: int | None
 - details: str | None
+- description: str | None
 - ledgers: <class 'sqloquent.asyncql.interfaces.AsyncRelatedCollection'>
 
 #### Properties
@@ -340,10 +349,12 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
 - details: str | None
+- description: str | None
 
 #### Properties
 
-- details: A packify.SerializableType stored in the database as a blob.
+- details: A string stored in the database as text. Note that this will be
+changed to a packify.SerializableType stored as a blob in 0.4.0.
 
 ### `Ledger(AsyncSqlModel)`
 
@@ -362,10 +373,13 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 - type: str
 - identity_id: str
 - currency_id: str
+- description: str | None
 - owner: AsyncRelatedModel
 - currency: AsyncRelatedModel
 - accounts: AsyncRelatedCollection
 - transactions: AsyncRelatedCollection
+- archived_transactions: AsyncRelatedCollection
+- statements: AsyncRelatedCollection
 
 #### Properties
 
@@ -426,11 +440,11 @@ categories: Asset, Liability, Equity.
 - data: dict
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
-- columns_excluded_from_hash: tuple[str]
 - details: bytes
 - pubkey: bytes | None
 - seed: bytes | None
 - secret_details: bytes | None
+- description: str | None
 - ledgers: AsyncRelatedCollection
 
 #### Properties
@@ -462,6 +476,7 @@ Return the public data for cloning the Identity.
 - ledger_ids: str
 - timestamp: str
 - details: bytes
+- description: str | None
 - entries: AsyncRelatedCollection
 - ledgers: AsyncRelatedCollection
 
@@ -522,6 +537,7 @@ ArchivedTransaction.
 - balances: bytes
 - timestamp: str
 - details: bytes
+- description: str | None
 - ledger: AsyncRelatedModel
 - transactions: AsyncRelatedCollection
 - archived_transactions: AsyncRelatedCollection
@@ -582,10 +598,12 @@ valid.
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
 - details: str | None
+- description: str | None
 
 #### Properties
 
-- details: A packify.SerializableType stored in the database as a blob.
+- details: A string stored in the database as text. Note that this will be
+changed to a packify.SerializableType stored as a blob in 0.4.0.
 
 ## Functions
 

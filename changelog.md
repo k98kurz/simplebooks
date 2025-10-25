@@ -1,3 +1,24 @@
+## 0.3.3
+
+- Added text `description` column to the following models:
+  - `Account`
+  - `ArchivedEntry`
+  - `ArchivedTransaction`
+  - `Currency`
+  - `Customer`
+  - `Entry`
+  - `Identity`
+  - `Ledger`
+  - `Statement`
+  - `Transaction`
+  - `Vendor`
+- Corrected `Customer` and `Vendor`: `details` column was incorrectly handled as
+  a packify.SerializableType stored as a blob, but the column type was text.
+  This has been corrected, and a note has been added to the documentation to
+  indicate that this will be changed to a packify.SerializableType stored as a
+  blob in 0.4.0.
+- Small improvements to some documentation
+
 ## 0.3.2
 
 - Updated packify dependency to 0.3.1 and applied compatibility patches
@@ -42,5 +63,3 @@
 
 - Adapted bookchain v0.2.0 update: new `AccountCategory` and `LedgerType`
 - Added a few helpful methods
-
-
