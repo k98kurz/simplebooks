@@ -1,7 +1,9 @@
 from __future__ import annotations
-from .Account import Account, AccountType
-from .Ledger import Ledger
 from sqloquent.asyncql import AsyncSqlModel, AsyncRelatedCollection
+import packify
+
+
+_empty_dict = packify.pack({})
 
 
 class Identity(AsyncSqlModel):
@@ -19,6 +21,15 @@ class Identity(AsyncSqlModel):
     secret_details: bytes|None
     description: str|None
     ledgers: AsyncRelatedCollection
+
+    # override automatic property
+    @property
+    def details(self) -> packify.SerializableType:
+        """A packify.SerializableType stored in the database as a blob."""
+        return packify.unpack(self.data.get('details', _empty_dict))
+    @details.setter
+    def details(self, val: packify.SerializableType):
+        self.data['details'] = packify.pack(val)
 
     def public(self) -> dict:
         """Return the public data for cloning the Identity."""
