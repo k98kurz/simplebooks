@@ -50,7 +50,7 @@ key bytes and private key seed bytes.
 `Ledger` represents a general ledger for a given `Identity` using a specific
 `Currency`. It includes a name, a `LedgerType`, the `Identity` id, and the
 `Currency` id. `LedgerType` is an enum representing the valid ledger types,
-either `PRESENT` or `FUTURE` for cash and accrual accounting, respectively, or
+either `CURRENT` or `FUTURE` for cash and accrual accounting, respectively, or
 for other uses the package user may define.
 
 `Account` represents an account for a given `Ledger`. It includes a name, a type
