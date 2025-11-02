@@ -72,7 +72,7 @@ class TestStatementsE2E(unittest.TestCase):
             'name': 'General Ledger',
             'identity_id': identity.id,
             'currency_id': currency.id,
-            'type': asyncql.LedgerType.PRESENT,
+            'type': asyncql.LedgerType.CURRENT,
         })
         asset_acct, liability_acct, equity_acct = ledger.setup_basic_accounts()
         await asset_acct.save()
@@ -156,4 +156,3 @@ class TestStatementsE2E(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
