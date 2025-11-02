@@ -31,6 +31,7 @@ Enum of valid Entry types: CREDIT and DEBIT.
 - account_id: str
 - details: bytes
 - description: str | None
+- timestamp: str | None
 - account: AsyncRelatedModel
 - transactions: AsyncRelatedCollection
 
@@ -47,11 +48,11 @@ check fails.
 
 ##### `__hash__() -> int:`
 
-##### `@classmethod async insert(data: dict) -> ArchivedEntry | None:`
+##### `@classmethod async insert(data: dict, /, *, parallel_events: bool = False, suppress_events: bool = False) -> ArchivedEntry | None:`
 
 Ensure data is encoded before inserting.
 
-##### `@classmethod async insert_many(items: list[dict]) -> int:`
+##### `@classmethod async insert_many(items: list[dict], /, *, parallel_events: bool = False, suppress_events: bool = False) -> int:`
 
 Ensure data is encoded before inserting.
 
@@ -79,6 +80,7 @@ Ensure conditions are encoded properly before querying.
 - account_id: str
 - details: bytes
 - description: str | None
+- timestamp: str | None
 - account: AsyncRelatedModel
 - transactions: AsyncRelatedCollection
 
@@ -97,11 +99,11 @@ precondition check fails.
 
 ##### `@staticmethod parse(models: Entry | list[Entry]) -> Entry | list[Entry]:`
 
-##### `@classmethod async insert(data: dict) -> Entry | None:`
+##### `@classmethod async insert(data: dict, /, *, parallel_events: bool = False, suppress_events: bool = False) -> Entry | None:`
 
 Ensure data is encoded before inserting.
 
-##### `@classmethod async insert_many(items: list[dict]) -> int:`
+##### `@classmethod async insert_many(items: list[dict], /, *, parallel_events: bool = False, suppress_events: bool = False) -> int:`
 
 Ensure data is encoded before inserting.
 
@@ -188,7 +190,7 @@ calculations of subaccounts if `include_sub_accounts=True`).
 
 ### `LedgerType(Enum)`
 
-Enum of valid ledger types: PRESENT and FUTURE for cash and accrual accounting,
+Enum of valid ledger types: CURRENT and FUTURE for cash and accrual accounting,
 respectively.
 
 ### `AccountCategory(AsyncSqlModel)`
@@ -348,13 +350,45 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
-- details: str | None
+- details: bytes | None
 - description: str | None
 
 #### Properties
 
-- details: A string stored in the database as text. Note that this will be
-changed to a packify.SerializableType stored as a blob in 0.4.0.
+- details: A packify.SerializableType stored in the database as a blob.
+
+### `Identity(AsyncSqlModel)`
+
+#### Annotations
+
+- table: str
+- id_column: str
+- columns: tuple[str]
+- id: str
+- name: str
+- query_builder_class: Type[AsyncQueryBuilderProtocol]
+- connection_info: str
+- data: dict
+- data_original: MappingProxyType
+- _event_hooks: dict[str, list[Callable]]
+- details: bytes
+- pubkey: bytes | None
+- seed: bytes | None
+- secret_details: bytes | None
+- description: str | None
+- ledgers: AsyncRelatedCollection
+
+#### Properties
+
+- details: A packify.SerializableType stored in the database as a blob.
+- ledgers: The related Ledgers. Setting raises TypeError if the precondition
+check fails.
+
+#### Methods
+
+##### `public() -> dict:`
+
+Return the public data for cloning the Identity.
 
 ### `Ledger(AsyncSqlModel)`
 
@@ -425,38 +459,6 @@ returned separately.
 
 Creates and returns a list of 3 unsaved Accounts covering the 3 basic
 categories: Asset, Liability, Equity.
-
-### `Identity(AsyncSqlModel)`
-
-#### Annotations
-
-- table: str
-- id_column: str
-- columns: tuple[str]
-- id: str
-- name: str
-- query_builder_class: Type[AsyncQueryBuilderProtocol]
-- connection_info: str
-- data: dict
-- data_original: MappingProxyType
-- _event_hooks: dict[str, list[Callable]]
-- details: bytes
-- pubkey: bytes | None
-- seed: bytes | None
-- secret_details: bytes | None
-- description: str | None
-- ledgers: AsyncRelatedCollection
-
-#### Properties
-
-- ledgers: The related Ledgers. Setting raises TypeError if the precondition
-check fails.
-
-#### Methods
-
-##### `public() -> dict:`
-
-Return the public data for cloning the Identity.
 
 ### `Transaction(AsyncSqlModel)`
 
@@ -597,13 +599,12 @@ valid.
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
-- details: str | None
+- details: bytes | None
 - description: str | None
 
 #### Properties
 
-- details: A string stored in the database as text. Note that this will be
-changed to a packify.SerializableType stored as a blob in 0.4.0.
+- details: A packify.SerializableType stored in the database as a blob.
 
 ## Functions
 
@@ -611,5 +612,4 @@ changed to a packify.SerializableType stored as a blob in 0.4.0.
 
 Set the connection info for all models to use the specified sqlite3 database
 file path.
-
 

@@ -141,6 +141,7 @@ LIABILITY, EQUITY, CONTRA_LIABILITY, CONTRA_EQUITY.
 - account_id: str
 - details: bytes
 - description: str | None
+- timestamp: str | None
 - account: RelatedModel
 - transactions: RelatedCollection
 
@@ -157,11 +158,11 @@ check fails.
 
 ##### `__hash__() -> int:`
 
-##### `@classmethod insert(data: dict) -> ArchivedEntry | None:`
+##### `@classmethod insert(data: dict, /, *, suppress_events: bool = False) -> ArchivedEntry | None:`
 
 Ensure data is encoded before inserting.
 
-##### `@classmethod insert_many(items: list[dict]) -> int:`
+##### `@classmethod insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
 
 Ensure data is encoded before inserting.
 
@@ -284,13 +285,12 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
-- details: str | None
+- details: bytes | None
 - description: str | None
 
 #### Properties
 
-- details: A string stored in the database as text. Note that this will be
-changed to a packify.SerializableType stored as a blob in 0.4.0.
+- details: A packify.SerializableType stored in the database as a blob.
 
 ### `Entry(SqlModel)`
 
@@ -312,6 +312,7 @@ changed to a packify.SerializableType stored as a blob in 0.4.0.
 - account_id: str
 - details: bytes
 - description: str | None
+- timestamp: str | None
 - account: RelatedModel
 - transactions: RelatedCollection
 
@@ -328,11 +329,11 @@ precondition check fails.
 
 ##### `__hash__() -> int:`
 
-##### `@classmethod insert(data: dict) -> Entry | None:`
+##### `@classmethod insert(data: dict, /, *, suppress_events: bool = False) -> Entry | None:`
 
 Ensure data is encoded before inserting.
 
-##### `@classmethod insert_many(items: list[dict]) -> int:`
+##### `@classmethod insert_many(items: list[dict], /, *, suppress_events: bool = False) -> int:`
 
 Ensure data is encoded before inserting.
 
@@ -372,6 +373,7 @@ Enum of valid Entry types: CREDIT and DEBIT.
 
 #### Properties
 
+- details: A packify.SerializableType stored in the database as a blob.
 - ledgers: The related Ledgers. Setting raises TypeError if the precondition
 check fails.
 
@@ -453,7 +455,7 @@ categories: Asset, Liability, Equity.
 
 ### `LedgerType(Enum)`
 
-Enum of valid ledger types: PRESENT and FUTURE for cash and accrual accounting,
+Enum of valid ledger types: CURRENT and FUTURE for cash and accrual accounting,
 respectively.
 
 ### `Statement(SqlModel)`
@@ -596,12 +598,12 @@ ArchivedTransaction.
 - data_original: MappingProxyType
 - _event_hooks: dict[str, list[Callable]]
 - code: str | None
-- details: str | None
+- details: bytes | None
+- description: str | None
 
 #### Properties
 
-- details: A string stored in the database as text. Note that this will be
-changed to a packify.SerializableType stored as a blob in 0.4.0.
+- details: A packify.SerializableType stored in the database as a blob.
 
 ## Functions
 
@@ -625,6 +627,14 @@ returns will be used as the migration file contents.
 
 Executes the sqloquent automigrate tool.
 
-### `version() -> str:`
+### `parse_timestamp(timestamp: str) -> int | None:`
 
+Helper function to automatically parse a timestamp string into a Unix epoch
+timestamp. Returns None if the timestamp is invalid. Supports: - Unix epoch as
+integer string (e.g., "1234567890") - Unix epoch as float string (e.g.,
+"1234567890.123") - ISO 8601 format strings (e.g., "2023-01-01T00:00:00Z") -
+Other datetime formats parseable by datetime.fromisoformat() or
+datetime.strptime()
+
+### `version() -> str:`
 
