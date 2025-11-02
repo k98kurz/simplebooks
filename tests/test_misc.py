@@ -1,4 +1,4 @@
-from context import models, simplebooks, asyncql
+from context import models, simplebooks, asyncql, helpers
 from decimal import Decimal
 from genericpath import isfile
 from sqlite3 import OperationalError
@@ -137,6 +137,16 @@ class TestMisc(unittest.TestCase):
             models.Account.query().count()
         simplebooks.automigrate(MIGRATIONS_PATH, DB_FILEPATH)
         assert models.Account.query().count() == 0
+
+    def test_parse_timestamp(self):
+        assert helpers.parse_timestamp('') == 0
+        assert type(helpers.parse_timestamp('1234567890')) is int
+        assert type(helpers.parse_timestamp('1234567890.123')) is int
+        assert type(helpers.parse_timestamp('2023-01-01T00:00:00Z')) is int
+        assert type(helpers.parse_timestamp('2023-01-01T00:00:00+00:00')) is int
+        assert type(helpers.parse_timestamp('2023-01-01T00:00:00-00:00')) is int
+        assert type(helpers.parse_timestamp('2023-01-01T00:00:00+00:00')) is int
+        assert helpers.parse_timestamp('not a timestamp') is None
 
 
 if __name__ == '__main__':
