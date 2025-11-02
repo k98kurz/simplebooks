@@ -1,3 +1,8 @@
+## 0.4.1
+
+- Bug fix: `Currency.format` was not using the `divider` argument properly;
+  fixed and coverage added to test suite
+
 ## 0.4.0
 
 - Renamed `LedgerType.PRESENT` to `LedgerType.CURRENT`.
