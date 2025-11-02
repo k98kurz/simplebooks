@@ -82,7 +82,7 @@ class Currency(AsyncSqlModel):
                 p = str(u)
                 while len(p) < decimal_places:
                     p = "0" + p
-                amount = f"{amount}:{p}"
+                amount = f"{amount}{divider}{p}"
             amount = amount[1:]
 
         if self.postfix_symbol and use_postfix:
