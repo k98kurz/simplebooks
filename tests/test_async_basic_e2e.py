@@ -231,6 +231,46 @@ class TestAsyncBasicE2E(unittest.TestCase):
             txn = run(asyncql.Transaction.prepare([equity_entry, asset_entry], str(int(time()))))
         assert 'unbalanced' in str(e.exception)
 
+        # test Entry.insert_many
+        entries = run(asyncql.Entry.insert_many([
+            {
+                'type': asyncql.EntryType.CREDIT,
+                'account_id': equity_acct.id,
+                'amount': 10_000_00,
+                'nonce': os.urandom(16),
+            },
+            {
+                'type': asyncql.EntryType.DEBIT,
+                'account_id': asset_acct.id,
+                'amount': 10_000_00,
+                'nonce': os.urandom(16),
+            },
+        ]))
+        assert entries == 2, entries
+
+        # test additional models
+        async def test_async_additional_models():
+            customer = asyncql.Customer({
+                'name': 'John Doe',
+                'code': 'JD',
+                'description': 'test customer (async)',
+            })
+            customer.details = {'foo': 'bar'}
+            await customer.save()
+            assert customer.id is not None
+            assert customer.details == {'foo': 'bar'}
+            vendor = asyncql.Vendor({
+                'name': 'Acme Inc.',
+                'code': 'ACME',
+                'description': 'test vendor (async)',
+            })
+            vendor.details = {'foo': 'bar'}
+            await vendor.save()
+            assert vendor.id is not None
+            assert vendor.details == {'foo': 'bar'}
+
+        run(test_async_additional_models())
+
 
 if __name__ == '__main__':
     unittest.main()

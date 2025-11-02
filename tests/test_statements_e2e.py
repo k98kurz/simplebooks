@@ -71,7 +71,7 @@ class TestStatementsE2E(unittest.TestCase):
             'name': 'General Ledger',
             'identity_id': identity.id,
             'currency_id': currency.id,
-            'type': models.LedgerType.PRESENT,
+            'type': models.LedgerType.CURRENT,
         })
         asset_acct, liability_acct, equity_acct = ledger.setup_basic_accounts()
         asset_acct.save()

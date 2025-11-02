@@ -13,6 +13,7 @@ class ArchivedEntry(SqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'type', 'amount', 'nonce', 'account_id', 'details', 'description',
+        'timestamp',
     )
     id: str
     type: str
@@ -21,6 +22,7 @@ class ArchivedEntry(SqlModel):
     account_id: str
     details: bytes
     description: str|None
+    timestamp: str|None
     account: RelatedModel
     transactions: RelatedCollection
 
@@ -64,16 +66,16 @@ class ArchivedEntry(SqlModel):
         return data
 
     @classmethod
-    def insert(cls, data: dict) -> ArchivedEntry | None:
+    def insert(cls, data: dict, /, *, suppress_events: bool = False) -> ArchivedEntry | None:
         """Ensure data is encoded before inserting."""
-        result = super().insert(cls._encode(data))
+        result = super().insert(cls._encode(data), suppress_events=suppress_events)
         return result
 
     @classmethod
-    def insert_many(cls, items: list[dict]) -> int:
+    def insert_many(cls, items: list[dict], /, *, suppress_events: bool = False) -> int:
         """Ensure data is encoded before inserting."""
-        items = [cls._encode(data) for data in list]
-        return super().insert_many(items)
+        items = [cls._encode(data) for data in items]
+        return super().insert_many(items, suppress_events=suppress_events)
 
     @classmethod
     def query(cls, conditions: dict = None) -> QueryBuilderProtocol:

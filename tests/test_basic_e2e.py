@@ -234,6 +234,44 @@ class TestBasicE2E(unittest.TestCase):
             txn = models.Transaction.prepare([equity_entry, asset_entry], str(int(time())))
         assert 'unbalanced' in str(e.exception)
 
+        # test Entry.insert_many
+        entries = models.Entry.insert_many([
+            {
+                'type': models.EntryType.CREDIT,
+                'account_id': equity_acct.id,
+                'amount': 10_000_00,
+                'nonce': os.urandom(16),
+            },
+            {
+                'type': models.EntryType.DEBIT,
+                'account_id': asset_acct.id,
+                'amount': 10_000_00,
+                'nonce': os.urandom(16),
+            },
+        ])
+        assert entries == 2, entries
+
+        # test additional models
+        customer = models.Customer({
+            'name': 'John Doe',
+            'code': 'JD',
+            'description': 'test customer',
+        })
+        customer.details = {'foo': 'bar'}
+        customer.save()
+        assert customer.id is not None
+        assert customer.details == {'foo': 'bar'}
+
+        vendor = models.Vendor({
+            'name': 'Acme Inc.',
+            'code': 'ACME',
+            'description': 'test vendor',
+        })
+        vendor.details = {'foo': 'bar'}
+        vendor.save()
+        assert vendor.id is not None
+        assert vendor.details == {'foo': 'bar'}
+
 
 if __name__ == '__main__':
     unittest.main()

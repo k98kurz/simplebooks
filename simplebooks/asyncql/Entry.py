@@ -16,6 +16,7 @@ class Entry(AsyncSqlModel):
     id_column: str = 'id'
     columns: tuple[str] = (
         'id', 'type', 'amount', 'nonce', 'account_id', 'details', 'description',
+        'timestamp',
     )
     id: str
     type: str
@@ -24,6 +25,7 @@ class Entry(AsyncSqlModel):
     account_id: str
     details: bytes
     description: str|None
+    timestamp: str|None
     account: AsyncRelatedModel
     transactions: AsyncRelatedCollection
 
@@ -76,16 +78,28 @@ class Entry(AsyncSqlModel):
         return models
 
     @classmethod
-    async def insert(cls, data: dict) -> Entry | None:
+    async def insert(
+            cls, data: dict, /, *, suppress_events: bool = False,
+            parallel_events: bool = False
+        ) -> Entry | None:
         """Ensure data is encoded before inserting."""
-        result = await super().insert(cls._encode(data))
+        result = await super().insert(
+            cls._encode(data), suppress_events=suppress_events,
+            parallel_events=parallel_events,
+        )
         return result
 
     @classmethod
-    async def insert_many(cls, items: list[dict]) -> int:
+    async def insert_many(
+            cls, items: list[dict], /, *, suppress_events: bool = False,
+            parallel_events: bool = False,
+        ) -> int:
         """Ensure data is encoded before inserting."""
-        items = [Entry._encode(data) for data in list]
-        return await super().insert_many(items)
+        items = [Entry._encode(data) for data in items]
+        return await super().insert_many(
+            items, suppress_events=suppress_events,
+            parallel_events=parallel_events,
+        )
 
     @classmethod
     def query(cls, conditions: dict = None) -> AsyncQueryBuilderProtocol:
