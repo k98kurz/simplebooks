@@ -82,7 +82,7 @@ class Statement(SqlModel):
             transactions are added. If reload is True, the entries are
             reloaded from the database.
         """
-        balances = parent_balances or {}
+        balances = (parent_balances or {}).copy()
         for txn in txns:
             if reload:
                 txn.entries().reload()
