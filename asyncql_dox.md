@@ -39,10 +39,10 @@ Enum of valid Entry types: CREDIT and DEBIT.
 
 - type: The EntryType of the Entry.
 - details: A packify.SerializableType stored in the database as a blob.
-- transactions: The related ArchivedTransactions. Setting raises TypeError if
-the precondition check fails.
-- account: The related Account. Setting raises TypeError if the precondition
-check fails.
+- transactions: The related `ArchivedTransaction`s. Attempting to set to a
+non-`ArchivedTransaction` raises a `TypeError`.
+- account: The related `Account`. Attempting to set to a non-`Account` raises a
+`TypeError`.
 
 #### Methods
 
@@ -88,10 +88,10 @@ Ensure conditions are encoded properly before querying.
 
 - type: The EntryType of the Entry.
 - details: A packify.SerializableType stored in the database as a blob.
-- account: The related Account. Setting raises TypeError if the precondition
-check fails.
-- transactions: The related Transactions. Setting raises TypeError if the
-precondition check fails.
+- account: The related `Account`. Attempting to set to a non-`Account` raises a
+`TypeError`.
+- transactions: The related `Transaction`s. Attempting to set to a
+non-`Transaction` raises a `TypeError`.
 
 #### Methods
 
@@ -149,18 +149,18 @@ ArchivedEntry.
 
 - type: The AccountType of the Account.
 - details: A packify.SerializableType stored in the database as a blob.
-- ledger: The related Ledger. Setting raises TypeError if the precondition check
-fails.
-- children: The related Accounts. Setting raises TypeError if the precondition
-check fails.
-- parent: The related Account. Setting raises TypeError if the precondition
-check fails.
-- category: The related AccountCategory. Setting raises TypeError if the
-precondition check fails.
-- entries: The related Entrys. Setting raises TypeError if the precondition
-check fails.
-- archived_entries: The related ArchivedEntrys. Setting raises TypeError if the
-precondition check fails.
+- ledger: The related `Ledger`. Attempting to set to a non-`Ledger` raises a
+`TypeError`.
+- children: The related `Account`s. Attempting to set to a non-`Account` raises
+a `TypeError`.
+- parent: The related `Account`. Attempting to set to a non-`Account` raises a
+`TypeError`.
+- category: The related `AccountCategory`. Attempting to set to a
+non-`AccountCategory` raises a `TypeError`.
+- entries: The related `Entry`s. Attempting to set to a non-`Entry` raises a
+`TypeError`.
+- archived_entries: The related `ArchivedEntry`s. Attempting to set to a
+non-`ArchivedEntry` raises a `TypeError`.
 
 #### Methods
 
@@ -214,8 +214,8 @@ respectively.
 #### Properties
 
 - ledger_type: The `LedgerType` that this `AccountCategory` applies to, if any.
-- accounts: The related Accounts. Setting raises TypeError if the precondition
-check fails.
+- accounts: The related `Account`s. Attempting to set to a non-`Account` raises
+a `TypeError`.
 
 #### Methods
 
@@ -261,12 +261,12 @@ Ensure conditions are encoded before querying.
 #### Properties
 
 - details: A packify.SerializableType stored in the database as a blob.
-- statements: The related Statements. Setting raises TypeError if the
-precondition check fails.
-- entries: The related ArchivedEntrys. Setting raises TypeError if the
-precondition check fails.
-- ledgers: The related Ledgers. Setting raises TypeError if the precondition
-check fails.
+- statements: The related `Statement`s. Attempting to set to a non-`Statement`
+raises a `TypeError`.
+- entries: The related `ArchivedEntry`s. Attempting to set to a
+non-`ArchivedEntry` raises a `TypeError`.
+- ledgers: The related `Ledger`s. Attempting to set to a non-`Ledger` raises a
+`TypeError`.
 
 #### Methods
 
@@ -307,8 +307,8 @@ Validate the transaction, save the entries, then save the transaction.
 
 #### Properties
 
-- ledgers: The related Ledgers. Setting raises TypeError if the precondition
-check fails.
+- ledgers: The related `Ledger`s. Attempting to set to a non-`Ledger` raises a
+`TypeError`.
 
 #### Methods
 
@@ -334,6 +334,11 @@ is `False`, instead the unit subdivisions from `get_units` will be combined
 using the `divider` char, and each part will be prefix padded with 0s to reach
 the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 '02:00'` for a Currency with `base=100` and `unit_divisions=1`.
+
+##### `parse(amount_str: str, /, *, divider: str = '.', decimal_places: int = 2, use_decimal: bool = True) -> str:`
+
+Inverse of `format`: takes a formatted `str` and outputs the correct `int`
+amount of base units.
 
 ### `Customer(AsyncSqlModel)`
 
@@ -381,8 +386,8 @@ the `decimal_places`. E.g. `.format(200, use_decimal=False, divider=':') ==
 #### Properties
 
 - details: A packify.SerializableType stored in the database as a blob.
-- ledgers: The related Ledgers. Setting raises TypeError if the precondition
-check fails.
+- ledgers: The related `Ledger`s. Attempting to set to a non-`Ledger` raises a
+`TypeError`.
 
 #### Methods
 
@@ -418,18 +423,18 @@ Return the public data for cloning the Identity.
 #### Properties
 
 - type: The LedgerType of the Ledger.
-- owner: The related Identity. Setting raises TypeError if the precondition
-check fails.
-- currency: The related Currency. Setting raises TypeError if the precondition
-check fails.
-- accounts: The related Accounts. Setting raises TypeError if the precondition
-check fails.
-- transactions: The related Transactions. Setting raises TypeError if the
-precondition check fails.
-- statements: The related Statements. Setting raises TypeError if the
-precondition check fails.
-- archived_transactions: The related ArchivedTransactions. Setting raises
-TypeError if the precondition check fails.
+- owner: The related `Identity`. Attempting to set to a non-`Identity` raises a
+`TypeError`.
+- currency: The related `Currency`. Attempting to set to a non-`Currency` raises
+a `TypeError`.
+- accounts: The related `Account`s. Attempting to set to a non-`Account` raises
+a `TypeError`.
+- transactions: The related `Transaction`s. Attempting to set to a
+non-`Transaction` raises a `TypeError`.
+- statements: The related `Statement`s. Attempting to set to a non-`Statement`
+raises a `TypeError`.
+- archived_transactions: The related `ArchivedTransaction`s. Attempting to set
+to a non-`ArchivedTransaction` raises a `TypeError`.
 
 #### Methods
 
@@ -485,12 +490,12 @@ categories: Asset, Liability, Equity.
 #### Properties
 
 - details: A packify.SerializableType stored in the database as a blob.
-- entries: The related Entrys. Setting raises TypeError if the precondition
-check fails.
-- ledgers: The related Ledgers. Setting raises TypeError if the precondition
-check fails.
-- statements: The related Statements. Setting raises TypeError if the
-precondition check fails.
+- entries: The related `Entry`s. Attempting to set to a non-`Entry` raises a
+`TypeError`.
+- ledgers: The related `Ledger`s. Attempting to set to a non-`Ledger` raises a
+`TypeError`.
+- statements: The related `Statement`s. Attempting to set to a non-`Statement`
+raises a `TypeError`.
 
 #### Methods
 
@@ -548,12 +553,12 @@ ArchivedTransaction.
 
 - tx_ids: A list of transaction IDs.
 - balances: A dict mapping account IDs to tuple[EntryType, int] balances.
-- ledger: The related Ledger. Setting raises TypeError if the precondition check
-fails.
-- transactions: The related Transactions. Setting raises TypeError if the
-precondition check fails.
-- archived_transactions: The related ArchivedTransactions. Setting raises
-TypeError if the precondition check fails.
+- ledger: The related `Ledger`. Attempting to set to a non-`Ledger` raises a
+`TypeError`.
+- transactions: The related `Transaction`s. Attempting to set to a
+non-`Transaction` raises a `TypeError`.
+- archived_transactions: The related `ArchivedTransaction`s. Attempting to set
+to a non-`ArchivedTransaction` raises a `TypeError`.
 
 #### Methods
 

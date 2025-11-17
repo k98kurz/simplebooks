@@ -21,7 +21,7 @@ classifiers = [
   "Topic :: Office/Business :: Financial :: Accounting",
 ]
 dependencies = [
-  "sqloquent >= 0.7.0",
+  "sqloquent >= 0.7.1",
   "packify >= 0.3.1"
 ]
 
@@ -32,7 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 asyncql = [
-  "sqloquent[asyncql] >= 0.7.0",
+  "sqloquent[asyncql] >= 0.7.1",
 ]
 docs = [
   "autodox >= 0.1.16"
