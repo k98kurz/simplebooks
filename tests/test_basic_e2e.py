@@ -124,9 +124,16 @@ class TestBasicE2E(unittest.TestCase):
         customer.description = 'a customer'
         customer.save()
 
-        # test empty transaction and entry
-        (models.Transaction()).details
-        (models.Entry()).details
+        # test empty identity, transaction, and entry
+        identity = models.Identity()
+        identity.data['details'] = None
+        identity.details
+        txn = models.Transaction()
+        txn.data['details'] = None
+        txn.details
+        entry = models.Entry()
+        entry.data['details'] = None
+        entry.details
 
         # prepare and save a valid transaction
         txn_nonce = os.urandom(16)

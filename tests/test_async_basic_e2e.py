@@ -123,9 +123,16 @@ class TestAsyncBasicE2E(unittest.TestCase):
         customer.description = 'a customer'
         run(customer.save())
 
-        # test empty transaction and entry
-        (asyncql.Transaction()).details
-        (asyncql.Entry()).details
+        # test empty identity, transaction, and entry
+        identity = asyncql.Identity()
+        identity.data['details'] = None
+        identity.details
+        txn = asyncql.Transaction()
+        txn.data['details'] = None
+        txn.details
+        entry = asyncql.Entry()
+        entry.data['details'] = None
+        entry.details
 
         # prepare and save a valid transaction
         txn_nonce = os.urandom(16)
