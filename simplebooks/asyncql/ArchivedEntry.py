@@ -46,7 +46,7 @@ class ArchivedEntry(AsyncSqlModel):
     @property
     def details(self) -> packify.SerializableType:
         """A packify.SerializableType stored in the database as a blob."""
-        return packify.unpack(self.data.get('details', _None))
+        return packify.unpack(self.data.get('details', None) or _None)
     @details.setter
     def details(self, val: packify.SerializableType):
         self.data['details'] = packify.pack(val)
